@@ -41,3 +41,7 @@ Thumbs.db
 *.pem
 *.key
 .claude/
+
+# Generated / build artifacts
+*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
