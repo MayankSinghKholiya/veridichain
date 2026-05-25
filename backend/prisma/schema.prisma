@@ -1,0 +1,90 @@
+// Prisma Schema — VeridiChain Backend DB
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  walletAddress String?   @unique
+  role          Role      @default(CANDIDATE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  otpSessions   OtpSession[]
+  institution   Institution?
+
+  @@map("users")
+}
+
+enum Role {
+  CANDIDATE
+  INSTITUTION
+  ADMIN
+}
+
+model OtpSession {
+  id        String   @id @default(cuid())
+  email     String
+  otp       String   // hashed OTP
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [email], references: [email])
+
+  @@map("otp_sessions")
+}
+
+model Institution {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
+  name          String
+  domain        String   @unique
+  country       String
+  website       String
+  passportDID   String?
+  logoUrl       String?
+  isAdminVerified Boolean @default(false)
+  onchainVerified Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@map("institutions")
+}
+
+model CredentialCache {
+  id            String   @id @default(cuid())
+  credentialId  String   @unique  // onchain bytes32 as hex string
+  ipfsCID       String
+  issuerAddress String
+  candidateAddress String
+  tier          Int      // 1 or 2
+  issuedAt      DateTime
+  isRevoked     Boolean  @default(false)
+  revokeReason  String?
+  cachedAt      DateTime @default(now())
+
+  @@map("credential_cache")
+}
+
+model VerificationLog {
+  id            String   @id @default(cuid())
+  credentialId  String
+  verifierEmail String?
+  verifierIp    String?
+  result        Boolean
+  verifiedAt    DateTime @default(now())
+
+  @@map("verification_logs")
+}

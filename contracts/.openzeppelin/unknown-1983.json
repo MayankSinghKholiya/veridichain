@@ -1,0 +1,1274 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0x936129F672B2754c25e569a5BEC7b689BaD174c1",
+      "txHash": "0x81e1b8951f6d7bbf5fae851fc742278a2a49f743317e4de779dd9a038517e71a",
+      "kind": "uups"
+    },
+    {
+      "address": "0xEaa3AEAc66A3533B2adF57c92bA5c7B1c2A2B094",
+      "txHash": "0xbcfea5069dcf565387995d15699dc80567a2c63a1cfb866df4365e89caad0205",
+      "kind": "uups"
+    },
+    {
+      "address": "0x6Fd5766baf4A16a393cdA6CE29521dBef6781783",
+      "txHash": "0x25c475f11e45c7cd0d04b2add733945c05a0c341d12d4c52d3d3651d6b5ef796",
+      "kind": "uups"
+    },
+    {
+      "address": "0xe76374e63A1CAeb0383c99443aF6845b405Fe2ad",
+      "txHash": "0x5eb3621c821307b8b4ebcc9860cf44d1fb1d63cc5e93da7a638597648206bb36",
+      "kind": "uups"
+    },
+    {
+      "address": "0xd20B0b3b663239f4A2Ce05C7d0a9dD734098f90F",
+      "txHash": "0x51814dbca808708d4fe9c2675b015a24fa67494c4daaebc2273444efabcbea34",
+      "kind": "uups"
+    },
+    {
+      "address": "0x4F446C17F438BF545C6991e0b3BBF27Af5Ad35C0",
+      "txHash": "0xfb5baa7483ea6716e71a1956fe3fb93ee2fce37406124576bba1928830dcf438",
+      "kind": "uups"
+    }
+  ],
+  "impls": {
+    "895f52a1c658d1e218a2105ba306d82ea31bb3f3f5070ab3499665353a5c1887": {
+      "address": "0x0871B918046A6B8c1D69Cd12d47dC062a90B5287",
+      "txHash": "0xcba7e0f51354140b716ae990769e6be18c064fdc5306451633cfe71729194e03",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "qiePass",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IQIEPass)10467",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:19"
+          },
+          {
+            "label": "qieStableCoin",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IERC20)1380",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:20"
+          },
+          {
+            "label": "qieDex",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IQIEDex)10431",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:20"
+          },
+          {
+            "label": "qieTokenAddress",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_address",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:22"
+          },
+          {
+            "label": "STAKE_AMOUNT",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:27"
+          },
+          {
+            "label": "TREASURY",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_address",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:29"
+          },
+          {
+            "label": "institutions",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_mapping(t_address,t_struct(Institution)10519_storage)",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:45"
+          },
+          {
+            "label": "domainToAddress",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_mapping(t_string_memory_ptr,t_address)",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:46"
+          },
+          {
+            "label": "institutionList",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:46"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)311_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)13_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IERC20)1380": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IQIEDex)10431": {
+            "label": "contract IQIEDex",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IQIEPass)10467": {
+            "label": "contract IQIEPass",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_struct(Institution)10519_storage)": {
+            "label": "mapping(address => struct InstitutionRegistry.Institution)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_address)": {
+            "label": "mapping(string => address)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Institution)10519_storage": {
+            "label": "struct InstitutionRegistry.Institution",
+            "members": [
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "domain",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "country",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "website",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "passportDID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "stakedAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "registeredAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "isVerified",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "isSlashed",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "7"
+              }
+            ],
+            "numberOfBytes": "256"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "f188bc05aa8a8e05b3ae3bcf98e031c4e44373270e82bfbe1b942ed0e905fe9c": {
+      "address": "0x95DB795710F8f3D9efA5454E135c10b80Fd08570",
+      "txHash": "0xf23316c8d20256797366b409545ed9103c33c3d639c5604bc58bc5134aded3e0",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "institutionRegistry",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(InstitutionRegistry)11145",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:14"
+          },
+          {
+            "label": "credentialNFT",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(CredentialNFT)9531",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:15"
+          },
+          {
+            "label": "credentials",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_bytes32,t_struct(Credential)9579_storage)",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:39"
+          },
+          {
+            "label": "candidateCredentials",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_address,t_array(t_bytes32)dyn_storage)",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:42"
+          },
+          {
+            "label": "allCredentialIds",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_array(t_bytes32)dyn_storage",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:44"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)311_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)13_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]",
+            "numberOfBytes": "32"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(CredentialNFT)9531": {
+            "label": "contract CredentialNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(InstitutionRegistry)11145": {
+            "label": "contract InstitutionRegistry",
+            "numberOfBytes": "20"
+          },
+          "t_enum(Tier)9555": {
+            "label": "enum CredentialRegistry.Tier",
+            "members": [
+              "NONE",
+              "INSTITUTION_VERIFIED",
+              "SELF_ATTESTED"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_array(t_bytes32)dyn_storage)": {
+            "label": "mapping(address => bytes32[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(Credential)9579_storage)": {
+            "label": "mapping(bytes32 => struct CredentialRegistry.Credential)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Credential)9579_storage": {
+            "label": "struct CredentialRegistry.Credential",
+            "members": [
+              {
+                "label": "credentialHash",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "ipfsCID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "issuer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "issuerPassDID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "candidate",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "candidatePassDID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "tier",
+                "type": "t_enum(Tier)9555",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "issuedAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "isRevoked",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "revokeReason",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "nftTokenId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "10"
+              }
+            ],
+            "numberOfBytes": "352"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "747293833b262384ebbefa6d1500b71b3887041d83c676a4239164fb0f49ece0": {
+      "address": "0xfa1CBb7460E32349C4F4247B5c80EAC3fFE2dEc5",
+      "txHash": "0x8bb811fac2f17484b69f84f05536da151aebec66b2af94698f591307c03084e8",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "qiePass",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IQIEPass)10467",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:19"
+          },
+          {
+            "label": "qieStableCoin",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IERC20)1380",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:20"
+          },
+          {
+            "label": "qieDex",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IQIEDex)10431",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:20"
+          },
+          {
+            "label": "qieTokenAddress",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_address",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:22"
+          },
+          {
+            "label": "STAKE_AMOUNT",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:27"
+          },
+          {
+            "label": "TREASURY",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_address",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:29"
+          },
+          {
+            "label": "institutions",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_mapping(t_address,t_struct(Institution)10519_storage)",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:45"
+          },
+          {
+            "label": "domainToAddress",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_mapping(t_string_memory_ptr,t_address)",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:46"
+          },
+          {
+            "label": "institutionList",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:46"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)311_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)13_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IERC20)1380": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IQIEDex)10431": {
+            "label": "contract IQIEDex",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IQIEPass)10467": {
+            "label": "contract IQIEPass",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_struct(Institution)10519_storage)": {
+            "label": "mapping(address => struct InstitutionRegistry.Institution)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_address)": {
+            "label": "mapping(string => address)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Institution)10519_storage": {
+            "label": "struct InstitutionRegistry.Institution",
+            "members": [
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "domain",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "country",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "website",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "passportDID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "stakedAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "registeredAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "isVerified",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "isSlashed",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "7"
+              }
+            ],
+            "numberOfBytes": "256"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "b1c0757e365490f332104719e566be0b7b9db5a58a2ba92fbdb1e1aaf9b5f7e0": {
+      "address": "0xa254cfBF5Ed0aC0ee7CCB40006d8b27A911f124b",
+      "txHash": "0xb6459940f6c0bdccfc2733b7f9c30ef67e74ca8e8295da9872cf4ab93927280c",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:169"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:111"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "qiePass",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_contract(IQIEPass)5328",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:19"
+          },
+          {
+            "label": "qieStableCoin",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_contract(IERC20)1474",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:20"
+          },
+          {
+            "label": "qieDex",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_contract(IQIEDex)5292",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:20"
+          },
+          {
+            "label": "qieTokenAddress",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_address",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:22"
+          },
+          {
+            "label": "STAKE_AMOUNT",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_uint256",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:27"
+          },
+          {
+            "label": "TREASURY",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_address",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:29"
+          },
+          {
+            "label": "institutions",
+            "offset": 0,
+            "slot": "207",
+            "type": "t_mapping(t_address,t_struct(Institution)5380_storage)",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:45"
+          },
+          {
+            "label": "domainToAddress",
+            "offset": 0,
+            "slot": "208",
+            "type": "t_mapping(t_string_memory_ptr,t_address)",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:46"
+          },
+          {
+            "label": "institutionList",
+            "offset": 0,
+            "slot": "209",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "InstitutionRegistry",
+            "src": "contracts/InstitutionRegistry.sol:46"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20)1474": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IQIEDex)5292": {
+            "label": "contract IQIEDex",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IQIEPass)5328": {
+            "label": "contract IQIEPass",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_struct(Institution)5380_storage)": {
+            "label": "mapping(address => struct InstitutionRegistry.Institution)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_address)": {
+            "label": "mapping(string => address)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Institution)5380_storage": {
+            "label": "struct InstitutionRegistry.Institution",
+            "members": [
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "domain",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "country",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "website",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "passportDID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "stakedAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "registeredAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "isVerified",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "isSlashed",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "7"
+              }
+            ],
+            "numberOfBytes": "256"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "f0234c3b71df64dc4fb2556d577fb7fd218419198ac9e67f5426d44063a7819a": {
+      "address": "0x40d22E81E1081Cb57B223CEC4647983031f633f8",
+      "txHash": "0xd2182b853cae4fdf33d7401f620b89717fe3a1f86cec97c36538efcee275a333",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:169"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:111"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "institutionRegistry",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_contract(InstitutionRegistry)6032",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:14"
+          },
+          {
+            "label": "credentialNFT",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_contract(CredentialNFT)4394",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:15"
+          },
+          {
+            "label": "credentials",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_mapping(t_bytes32,t_struct(Credential)4442_storage)",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:39"
+          },
+          {
+            "label": "candidateCredentials",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_mapping(t_address,t_array(t_bytes32)dyn_storage)",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:42"
+          },
+          {
+            "label": "allCredentialIds",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_array(t_bytes32)dyn_storage",
+            "contract": "CredentialRegistry",
+            "src": "contracts/CredentialRegistry.sol:44"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(CredentialNFT)4394": {
+            "label": "contract CredentialNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(InstitutionRegistry)6032": {
+            "label": "contract InstitutionRegistry",
+            "numberOfBytes": "20"
+          },
+          "t_enum(Tier)4418": {
+            "label": "enum CredentialRegistry.Tier",
+            "members": [
+              "NONE",
+              "INSTITUTION_VERIFIED",
+              "SELF_ATTESTED"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_array(t_bytes32)dyn_storage)": {
+            "label": "mapping(address => bytes32[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(Credential)4442_storage)": {
+            "label": "mapping(bytes32 => struct CredentialRegistry.Credential)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Credential)4442_storage": {
+            "label": "struct CredentialRegistry.Credential",
+            "members": [
+              {
+                "label": "credentialHash",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "ipfsCID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "issuer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "issuerPassDID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "candidate",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "candidatePassDID",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "tier",
+                "type": "t_enum(Tier)4418",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "issuedAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "isRevoked",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "revokeReason",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "nftTokenId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "10"
+              }
+            ],
+            "numberOfBytes": "352"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    }
+  }
+}

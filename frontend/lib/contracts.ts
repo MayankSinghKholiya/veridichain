@@ -1,0 +1,760 @@
+// ── Compiled ABIs from Hardhat artifacts ──────────────────────
+// Do NOT use parseAbi here — it doesn't support tuple return types.
+// Typed as `Abi` so wagmi v2 writeContract doesn't require chain/account params.
+import type { Abi } from "viem";
+
+export const INSTITUTION_REGISTRY_ABI: Abi = [
+  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+  { inputs: [{ internalType: "address", name: "target", type: "address" }], name: "AddressEmptyCode", type: "error" },
+  { inputs: [{ internalType: "address", name: "implementation", type: "address" }], name: "ERC1967InvalidImplementation", type: "error" },
+  { inputs: [], name: "ERC1967NonPayable", type: "error" },
+  { inputs: [], name: "FailedCall", type: "error" },
+  { inputs: [], name: "InvalidInitialization", type: "error" },
+  { inputs: [], name: "NotInitializing", type: "error" },
+  { inputs: [{ internalType: "address", name: "owner", type: "address" }], name: "OwnableInvalidOwner", type: "error" },
+  { inputs: [{ internalType: "address", name: "account", type: "address" }], name: "OwnableUnauthorizedAccount", type: "error" },
+  { inputs: [], name: "UUPSUnauthorizedCallContext", type: "error" },
+  { inputs: [{ internalType: "bytes32", name: "slot", type: "bytes32" }], name: "UUPSUnsupportedProxiableUUID", type: "error" },
+  { anonymous: false, inputs: [{ indexed: false, internalType: "uint64", name: "version", type: "uint64" }], name: "Initialized", type: "event" },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "address", name: "institution", type: "address" },
+      { indexed: false, internalType: "string",  name: "name",        type: "string"  },
+      { indexed: false, internalType: "string",  name: "domain",      type: "string"  },
+      { indexed: false, internalType: "string",  name: "passportDID", type: "string"  },
+    ],
+    name: "InstitutionRegistered", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "address", name: "institution", type: "address" },
+      { indexed: false, internalType: "string",  name: "reason",      type: "string"  },
+    ],
+    name: "InstitutionRevoked", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "address", name: "institution", type: "address" },
+      { indexed: false, internalType: "uint256", name: "amount",      type: "uint256" },
+      { indexed: false, internalType: "string",  name: "reason",      type: "string"  },
+    ],
+    name: "InstitutionSlashed", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "institution", type: "address" },
+      { indexed: true, internalType: "address", name: "admin",       type: "address" },
+    ],
+    name: "InstitutionVerified", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "address", name: "previousOwner", type: "address" },
+      { indexed: true,  internalType: "address", name: "newOwner",       type: "address" },
+    ],
+    name: "OwnershipTransferred", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "address", name: "institution", type: "address" },
+      { indexed: false, internalType: "uint256", name: "amount",      type: "uint256" },
+    ],
+    name: "StakeWithdrawn", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: "address", name: "implementation", type: "address" }],
+    name: "Upgraded", type: "event",
+  },
+  { inputs: [], name: "DEAD_ADDRESS",              outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view",        type: "function" },
+  { inputs: [], name: "STAKE_AMOUNT",              outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view",        type: "function" },
+  { inputs: [], name: "TREASURY",                  outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view",        type: "function" },
+  { inputs: [], name: "UPGRADE_INTERFACE_VERSION", outputs: [{ internalType: "string",  name: "", type: "string"  }], stateMutability: "view",        type: "function" },
+  { inputs: [{ internalType: "string", name: "", type: "string" }], name: "domainToAddress", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "getAllInstitutions",    outputs: [{ internalType: "address[]", name: "", type: "address[]" }], stateMutability: "view",        type: "function" },
+  {
+    inputs: [{ internalType: "address", name: "_institution", type: "address" }],
+    name: "getInstitution",
+    outputs: [
+      {
+        components: [
+          { internalType: "string",  name: "name",         type: "string"  },
+          { internalType: "string",  name: "domain",       type: "string"  },
+          { internalType: "string",  name: "country",      type: "string"  },
+          { internalType: "string",  name: "website",      type: "string"  },
+          { internalType: "string",  name: "passportDID",  type: "string"  },
+          { internalType: "uint256", name: "stakedAmount", type: "uint256" },
+          { internalType: "uint256", name: "registeredAt", type: "uint256" },
+          { internalType: "bool",    name: "isVerified",   type: "bool"    },
+          { internalType: "bool",    name: "isSlashed",    type: "bool"    },
+        ],
+        internalType: "struct InstitutionRegistry.Institution",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  { inputs: [], name: "getTotalInstitutions", outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [
+      { internalType: "address", name: "_qiePass",       type: "address" },
+      { internalType: "address", name: "_qieStableCoin", type: "address" },
+      { internalType: "address", name: "_qieDex",        type: "address" },
+      { internalType: "address", name: "_qieToken",      type: "address" },
+      { internalType: "address", name: "_treasury",      type: "address" },
+      { internalType: "uint256", name: "_stakeAmount",   type: "uint256" },
+    ],
+    name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  { inputs: [{ internalType: "uint256", name: "", type: "uint256" }], name: "institutionList", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "institutions",
+    outputs: [
+      { internalType: "string",  name: "name",         type: "string"  },
+      { internalType: "string",  name: "domain",       type: "string"  },
+      { internalType: "string",  name: "country",      type: "string"  },
+      { internalType: "string",  name: "website",      type: "string"  },
+      { internalType: "string",  name: "passportDID",  type: "string"  },
+      { internalType: "uint256", name: "stakedAmount", type: "uint256" },
+      { internalType: "uint256", name: "registeredAt", type: "uint256" },
+      { internalType: "bool",    name: "isVerified",   type: "bool"    },
+      { internalType: "bool",    name: "isSlashed",    type: "bool"    },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  { inputs: [{ internalType: "address", name: "_institution", type: "address" }], name: "isVerified", outputs: [{ internalType: "bool", name: "", type: "bool" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "owner",         outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view",        type: "function" },
+  { inputs: [], name: "proxiableUUID", outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }], stateMutability: "view",        type: "function" },
+  { inputs: [], name: "qieDex",        outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view",        type: "function" },
+  { inputs: [], name: "qiePass",       outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view",        type: "function" },
+  { inputs: [], name: "qieStableCoin", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view",        type: "function" },
+  { inputs: [], name: "qieTokenAddress", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view",      type: "function" },
+  {
+    inputs: [
+      { internalType: "string", name: "_name",    type: "string" },
+      { internalType: "string", name: "_domain",  type: "string" },
+      { internalType: "string", name: "_country", type: "string" },
+      { internalType: "string", name: "_website", type: "string" },
+    ],
+    name: "registerInstitution",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  { inputs: [], name: "renounceOwnership", outputs: [], stateMutability: "nonpayable", type: "function" },
+  {
+    inputs: [
+      { internalType: "address", name: "_institution", type: "address" },
+      { internalType: "string",  name: "_reason",      type: "string"  },
+    ],
+    name: "slashInstitution",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  { inputs: [{ internalType: "address", name: "newOwner", type: "address" }], name: "transferOwnership", outputs: [], stateMutability: "nonpayable", type: "function" },
+  {
+    inputs: [
+      { internalType: "address", name: "newImplementation", type: "address" },
+      { internalType: "bytes",   name: "data",              type: "bytes"   },
+    ],
+    name: "upgradeToAndCall",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  { inputs: [{ internalType: "address", name: "_institution", type: "address" }], name: "verifyInstitution", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [], name: "withdrawStake", outputs: [], stateMutability: "nonpayable", type: "function" },
+] as Abi;
+
+// ── CredentialRegistry ABI ────────────────────────────────────
+export const CREDENTIAL_REGISTRY_ABI = [
+  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+  { inputs: [{ internalType: "address", name: "target",         type: "address" }], name: "AddressEmptyCode",            type: "error" },
+  { inputs: [{ internalType: "address", name: "implementation", type: "address" }], name: "ERC1967InvalidImplementation", type: "error" },
+  { inputs: [], name: "ERC1967NonPayable",        type: "error" },
+  { inputs: [], name: "FailedCall",               type: "error" },
+  { inputs: [], name: "InvalidInitialization",    type: "error" },
+  { inputs: [], name: "NotInitializing",          type: "error" },
+  { inputs: [{ internalType: "address", name: "owner",   type: "address" }], name: "OwnableInvalidOwner",      type: "error" },
+  { inputs: [{ internalType: "address", name: "account", type: "address" }], name: "OwnableUnauthorizedAccount", type: "error" },
+  { inputs: [], name: "UUPSUnauthorizedCallContext", type: "error" },
+  { inputs: [{ internalType: "bytes32", name: "slot", type: "bytes32" }], name: "UUPSUnsupportedProxiableUUID", type: "error" },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "bytes32",                          name: "credentialId",   type: "bytes32" },
+      { indexed: true,  internalType: "address",                          name: "issuer",         type: "address" },
+      { indexed: true,  internalType: "address",                          name: "candidate",      type: "address" },
+      { indexed: false, internalType: "bytes32",                          name: "credentialHash", type: "bytes32" },
+      { indexed: false, internalType: "enum CredentialRegistry.Tier",     name: "tier",           type: "uint8"   },
+      { indexed: false, internalType: "uint256",                          name: "timestamp",      type: "uint256" },
+    ],
+    name: "CredentialIssued", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "bytes32", name: "oldCredentialId", type: "bytes32" },
+      { indexed: true, internalType: "bytes32", name: "newCredentialId", type: "bytes32" },
+      { indexed: true, internalType: "address", name: "newWallet",       type: "address" },
+    ],
+    name: "CredentialReissued", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "bytes32", name: "credentialId", type: "bytes32" },
+      { indexed: true,  internalType: "address", name: "revokedBy",    type: "address" },
+      { indexed: false, internalType: "string",  name: "reason",       type: "string"  },
+      { indexed: false, internalType: "uint256", name: "timestamp",    type: "uint256" },
+    ],
+    name: "CredentialRevoked", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "bytes32", name: "credentialId", type: "bytes32" },
+      { indexed: true,  internalType: "address", name: "institution",  type: "address" },
+      { indexed: false, internalType: "uint256", name: "timestamp",    type: "uint256" },
+    ],
+    name: "CredentialUpgraded", type: "event",
+  },
+  { anonymous: false, inputs: [{ indexed: false, internalType: "uint64",  name: "version",       type: "uint64"  }], name: "Initialized",         type: "event" },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "previousOwner", type: "address" },
+      { indexed: true, internalType: "address", name: "newOwner",       type: "address" },
+    ],
+    name: "OwnershipTransferred", type: "event",
+  },
+  { anonymous: false, inputs: [{ indexed: true,  internalType: "address", name: "implementation", type: "address" }], name: "Upgraded", type: "event" },
+  { inputs: [], name: "UPGRADE_INTERFACE_VERSION", outputs: [{ internalType: "string", name: "", type: "string" }], stateMutability: "view", type: "function" },
+  { inputs: [{ internalType: "uint256", name: "", type: "uint256" }], name: "allCredentialIds", outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [
+      { internalType: "address", name: "", type: "address"  },
+      { internalType: "uint256", name: "", type: "uint256"  },
+    ],
+    name: "candidateCredentials",
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  { inputs: [], name: "credentialNFT", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    name: "credentials",
+    outputs: [
+      { internalType: "bytes32",                      name: "credentialHash",  type: "bytes32" },
+      { internalType: "string",                       name: "ipfsCID",         type: "string"  },
+      { internalType: "address",                      name: "issuer",          type: "address" },
+      { internalType: "string",                       name: "issuerPassDID",   type: "string"  },
+      { internalType: "address",                      name: "candidate",       type: "address" },
+      { internalType: "string",                       name: "candidatePassDID",type: "string"  },
+      { internalType: "enum CredentialRegistry.Tier", name: "tier",            type: "uint8"   },
+      { internalType: "uint256",                      name: "issuedAt",        type: "uint256" },
+      { internalType: "bool",                         name: "isRevoked",       type: "bool"    },
+      { internalType: "string",                       name: "revokeReason",    type: "string"  },
+      { internalType: "uint256",                      name: "nftTokenId",      type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  { inputs: [{ internalType: "address", name: "_candidate", type: "address" }], name: "getCredentialsByCandidate", outputs: [{ internalType: "bytes32[]", name: "", type: "bytes32[]" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "getTotalCredentials", outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [
+      { internalType: "address", name: "_institutionRegistry", type: "address" },
+      { internalType: "address", name: "_credentialNFT",       type: "address" },
+    ],
+    name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  { inputs: [], name: "institutionRegistry", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [
+      { internalType: "address", name: "_candidate",       type: "address" },
+      { internalType: "bytes32", name: "_credentialHash",  type: "bytes32" },
+      { internalType: "string",  name: "_ipfsCID",         type: "string"  },
+      { internalType: "string",  name: "_candidatePassDID",type: "string"  },
+    ],
+    name: "issueCredential",
+    outputs: [{ internalType: "bytes32", name: "credentialId", type: "bytes32" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  { inputs: [], name: "owner", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "proxiableUUID", outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [
+      { internalType: "bytes32", name: "_oldCredentialId", type: "bytes32" },
+      { internalType: "address", name: "_newWallet",       type: "address" },
+      { internalType: "string",  name: "_newIpfsCID",      type: "string"  },
+    ],
+    name: "reissueCredential",
+    outputs: [{ internalType: "bytes32", name: "newCredentialId", type: "bytes32" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  { inputs: [], name: "renounceOwnership", outputs: [], stateMutability: "nonpayable", type: "function" },
+  {
+    inputs: [
+      { internalType: "bytes32", name: "_credentialId", type: "bytes32" },
+      { internalType: "string",  name: "_reason",       type: "string"  },
+    ],
+    name: "revokeCredential",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "bytes32", name: "_credentialHash",   type: "bytes32" },
+      { internalType: "string",  name: "_ipfsCID",          type: "string"  },
+      { internalType: "string",  name: "_candidatePassDID", type: "string"  },
+    ],
+    name: "selfAttestCredential",
+    outputs: [{ internalType: "bytes32", name: "credentialId", type: "bytes32" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  { inputs: [{ internalType: "address", name: "newOwner", type: "address" }], name: "transferOwnership", outputs: [], stateMutability: "nonpayable", type: "function" },
+  {
+    inputs: [
+      { internalType: "address", name: "newImplementation", type: "address" },
+      { internalType: "bytes",   name: "data",              type: "bytes"   },
+    ],
+    name: "upgradeToAndCall",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  { inputs: [{ internalType: "bytes32", name: "_credentialId", type: "bytes32" }], name: "upgradeToTier1", outputs: [], stateMutability: "nonpayable", type: "function" },
+  {
+    inputs: [{ internalType: "bytes32", name: "_credentialId", type: "bytes32" }],
+    name: "verifyCredential",
+    outputs: [
+      { internalType: "bool",                         name: "isValid",      type: "bool"    },
+      { internalType: "address",                      name: "issuer",       type: "address" },
+      { internalType: "string",                       name: "issuerPassDID",type: "string"  },
+      { internalType: "address",                      name: "candidate",    type: "address" },
+      { internalType: "enum CredentialRegistry.Tier", name: "tier",         type: "uint8"   },
+      { internalType: "uint256",                      name: "issuedAt",     type: "uint256" },
+      { internalType: "bool",                         name: "isRevoked",    type: "bool"    },
+      { internalType: "string",                       name: "revokeReason", type: "string"  },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+] as Abi;
+
+// ── CredentialNFT ABI ─────────────────────────────────────────
+export const CREDENTIAL_NFT_ABI = [
+  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+  { inputs: [{ internalType: "address", name: "sender",   type: "address" }, { internalType: "uint256", name: "tokenId", type: "uint256" }, { internalType: "address", name: "owner", type: "address" }], name: "ERC721IncorrectOwner",     type: "error" },
+  { inputs: [{ internalType: "address", name: "operator", type: "address" }, { internalType: "uint256", name: "tokenId", type: "uint256" }],                                                               name: "ERC721InsufficientApproval", type: "error" },
+  { inputs: [{ internalType: "address", name: "approver", type: "address" }], name: "ERC721InvalidApprover",  type: "error" },
+  { inputs: [{ internalType: "address", name: "operator", type: "address" }], name: "ERC721InvalidOperator",  type: "error" },
+  { inputs: [{ internalType: "address", name: "owner",    type: "address" }], name: "ERC721InvalidOwner",     type: "error" },
+  { inputs: [{ internalType: "address", name: "receiver", type: "address" }], name: "ERC721InvalidReceiver",  type: "error" },
+  { inputs: [{ internalType: "address", name: "sender",   type: "address" }], name: "ERC721InvalidSender",    type: "error" },
+  { inputs: [{ internalType: "uint256", name: "tokenId",  type: "uint256" }], name: "ERC721NonexistentToken", type: "error" },
+  { inputs: [{ internalType: "address", name: "owner",    type: "address" }], name: "OwnableInvalidOwner",    type: "error" },
+  { inputs: [{ internalType: "address", name: "account",  type: "address" }], name: "OwnableUnauthorizedAccount", type: "error" },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "owner",    type: "address" },
+      { indexed: true, internalType: "address", name: "approved", type: "address" },
+      { indexed: true, internalType: "uint256", name: "tokenId",  type: "uint256" },
+    ],
+    name: "Approval", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "address", name: "owner",    type: "address" },
+      { indexed: true,  internalType: "address", name: "operator", type: "address" },
+      { indexed: false, internalType: "bool",    name: "approved", type: "bool"    },
+    ],
+    name: "ApprovalForAll", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "address", name: "to",           type: "address" },
+      { indexed: false, internalType: "uint256", name: "tokenId",      type: "uint256" },
+      { indexed: false, internalType: "bytes32", name: "credentialId", type: "bytes32" },
+    ],
+    name: "CredentialNFTMinted", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: "uint256", name: "tokenId", type: "uint256" },
+      { indexed: false, internalType: "uint8",   name: "newTier", type: "uint8"   },
+    ],
+    name: "CredentialNFTTierUpdated", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "previousOwner", type: "address" },
+      { indexed: true, internalType: "address", name: "newOwner",       type: "address" },
+    ],
+    name: "OwnershipTransferred", type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "from",    type: "address" },
+      { indexed: true, internalType: "address", name: "to",      type: "address" },
+      { indexed: true, internalType: "uint256", name: "tokenId", type: "uint256" },
+    ],
+    name: "Transfer", type: "event",
+  },
+  { inputs: [{ internalType: "address", name: "to", type: "address" }, { internalType: "uint256", name: "tokenId", type: "uint256" }], name: "approve", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "address", name: "owner", type: "address" }], name: "balanceOf", outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "credentialRegistry", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  { inputs: [{ internalType: "bytes32", name: "", type: "bytes32" }], name: "credentialToToken", outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view", type: "function" },
+  { inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }], name: "getApproved", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  { inputs: [{ internalType: "address", name: "owner", type: "address" }, { internalType: "address", name: "operator", type: "address" }], name: "isApprovedForAll", outputs: [{ internalType: "bool", name: "", type: "bool" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [
+      { internalType: "address", name: "_to",           type: "address" },
+      { internalType: "bytes32", name: "_credentialId", type: "bytes32" },
+      { internalType: "string",  name: "_ipfsCID",      type: "string"  },
+      { internalType: "uint8",   name: "_tier",         type: "uint8"   },
+    ],
+    name: "mintCredential",
+    outputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  { inputs: [], name: "name",  outputs: [{ internalType: "string", name: "", type: "string" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "owner", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  { inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }], name: "ownerOf", outputs: [{ internalType: "address", name: "", type: "address" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "renounceOwnership", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "address", name: "from", type: "address" }, { internalType: "address", name: "to", type: "address" }, { internalType: "uint256", name: "tokenId", type: "uint256" }], name: "safeTransferFrom", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "address", name: "from", type: "address" }, { internalType: "address", name: "to", type: "address" }, { internalType: "uint256", name: "tokenId", type: "uint256" }, { internalType: "bytes", name: "data", type: "bytes" }], name: "safeTransferFrom", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "address", name: "operator", type: "address" }, { internalType: "bool", name: "approved", type: "bool" }], name: "setApprovalForAll", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "address", name: "_registry", type: "address" }], name: "setRegistry", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "bytes4", name: "interfaceId", type: "bytes4" }], name: "supportsInterface", outputs: [{ internalType: "bool", name: "", type: "bool" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "symbol", outputs: [{ internalType: "string", name: "", type: "string" }], stateMutability: "view", type: "function" },
+  {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "tokenMetadata",
+    outputs: [
+      { internalType: "bytes32", name: "credentialId", type: "bytes32" },
+      { internalType: "string",  name: "ipfsCID",      type: "string"  },
+      { internalType: "uint8",   name: "tier",         type: "uint8"   },
+      { internalType: "uint256", name: "issuedAt",     type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  { inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }], name: "tokenURI", outputs: [{ internalType: "string", name: "", type: "string" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "totalSupply", outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view", type: "function" },
+  { inputs: [{ internalType: "address", name: "from", type: "address" }, { internalType: "address", name: "to", type: "address" }, { internalType: "uint256", name: "tokenId", type: "uint256" }], name: "transferFrom", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "address", name: "newOwner", type: "address" }], name: "transferOwnership", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "bytes32", name: "_credentialId", type: "bytes32" }, { internalType: "uint8", name: "_newTier", type: "uint8" }], name: "updateTier", outputs: [], stateMutability: "nonpayable", type: "function" },
+] as Abi;
+
+// ── QIE Pass ABI (based on IQIEPass.sol interface) ───────────
+// NOTE: Real function signatures may differ once QIE publishes official ABI.
+// Update this when QIE Pass contract address becomes available on testnet.
+export const QIEPASS_ABI: Abi = [
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "hasValidPass",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "getDID",
+    outputs: [{ internalType: "string", name: "", type: "string" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "getPassExpiry",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "isRevoked",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+] as Abi;
+
+// ── QIE StableCoin ABI (minimal — only what we use) ──────────
+export const QIE_STABLE_COIN_ABI = [
+  { inputs: [{ internalType: "address", name: "spender", type: "address" }, { internalType: "uint256", name: "amount", type: "uint256" }], name: "approve",   outputs: [{ internalType: "bool",    name: "", type: "bool"    }], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ internalType: "address", name: "owner",   type: "address" }, { internalType: "address", name: "spender", type: "address" }],  name: "allowance", outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view",        type: "function" },
+  { inputs: [{ internalType: "address", name: "account", type: "address" }],                                                                  name: "balanceOf", outputs: [{ internalType: "uint256", name: "", type: "uint256" }], stateMutability: "view",        type: "function" },
+  { inputs: [],                                                                                                                                  name: "decimals",  outputs: [{ internalType: "uint8",   name: "", type: "uint8"   }], stateMutability: "view",        type: "function" },
+  { inputs: [],                                                                                                                                  name: "symbol",    outputs: [{ internalType: "string",  name: "", type: "string"  }], stateMutability: "view",        type: "function" },
+] as Abi;
+
+// ── Tier enum helper ──────────────────────────────────────────
+export const CREDENTIAL_TIER = {
+  0: { label: "Unknown",              color: "gray"  },
+  1: { label: "Institution Verified", color: "green" },
+  2: { label: "Self Attested",        color: "amber" },
+} as const;
+
+export type TierKey = keyof typeof CREDENTIAL_TIER;
+
+// ── Contract addresses (from .env.local) ──────────────────────
+export const CONTRACTS = {
+  INSTITUTION_REGISTRY:         process.env.NEXT_PUBLIC_INSTITUTION_REGISTRY           as `0x${string}`,
+  CREDENTIAL_REGISTRY:          process.env.NEXT_PUBLIC_CREDENTIAL_REGISTRY            as `0x${string}`,
+  CREDENTIAL_NFT:               process.env.NEXT_PUBLIC_CREDENTIAL_NFT                 as `0x${string}`,
+  QIE_PASS:                     process.env.NEXT_PUBLIC_QIE_PASS_ADDRESS               as `0x${string}`,
+  QIE_STABLE_COIN:              process.env.NEXT_PUBLIC_QIE_STABLE_COIN_ADDRESS        as `0x${string}`,
+  QIE_DEX:                      process.env.NEXT_PUBLIC_QIE_DEX_ADDRESS                as `0x${string}`,
+  MANUAL_VERIFICATION_REGISTRY: process.env.NEXT_PUBLIC_MANUAL_VERIFICATION_REGISTRY   as `0x${string}` | undefined,
+};
+
+// ── ManualVerificationRegistry ABI ───────────────────────────
+export const MANUAL_VERIFICATION_REGISTRY_ABI: Abi = [
+  // ── Write functions ──
+  {
+    inputs: [
+      { internalType: "bytes32", name: "_credentialId",    type: "bytes32" },
+      { internalType: "string",  name: "_documentIpfsCID", type: "string"  },
+      { internalType: "string",  name: "_candidateNote",   type: "string"  },
+    ],
+    name: "submitVerificationRequest",
+    outputs: [{ internalType: "uint256", name: "requestId", type: "uint256" }],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_requestId", type: "uint256" },
+      { internalType: "string",  name: "_note",      type: "string"  },
+    ],
+    name: "approveRequest",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_requestId", type: "uint256" },
+      { internalType: "string",  name: "_reason",    type: "string"  },
+    ],
+    name: "rejectRequest",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "_v", type: "address" }],
+    name: "addVerifier",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "_v", type: "address" }],
+    name: "removeVerifier",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "_fee", type: "uint256" }],
+    name: "setFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "withdrawFees",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  // ── View functions ──
+  {
+    inputs: [{ internalType: "uint256", name: "_requestId", type: "uint256" }],
+    name: "getRequest",
+    outputs: [
+      {
+        components: [
+          { internalType: "uint256", name: "id",              type: "uint256" },
+          { internalType: "bytes32", name: "credentialId",    type: "bytes32" },
+          { internalType: "address", name: "candidate",       type: "address" },
+          { internalType: "string",  name: "documentIpfsCID", type: "string"  },
+          { internalType: "string",  name: "candidateNote",   type: "string"  },
+          { internalType: "uint8",   name: "status",          type: "uint8"   },
+          { internalType: "address", name: "reviewedBy",      type: "address" },
+          { internalType: "string",  name: "reviewNote",      type: "string"  },
+          { internalType: "uint256", name: "submittedAt",     type: "uint256" },
+          { internalType: "uint256", name: "reviewedAt",      type: "uint256" },
+        ],
+        internalType: "struct ManualVerificationRegistry.VerificationRequest",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getAllRequestIds",
+    outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "bytes32", name: "_credentialId", type: "bytes32" }],
+    name: "getTeamVerification",
+    outputs: [
+      {
+        components: [
+          { internalType: "bool",    name: "verified",   type: "bool"    },
+          { internalType: "string",  name: "note",       type: "string"  },
+          { internalType: "address", name: "verifiedBy", type: "address" },
+          { internalType: "uint256", name: "verifiedAt", type: "uint256" },
+        ],
+        internalType: "struct ManualVerificationRegistry.TeamVerification",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getVerifierList",
+    outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "_addr", type: "address" }],
+    name: "isTeamMember",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "isVerifier",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "requestCount",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "verificationFee",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    name: "credentialToRequest",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  // ── Events ──
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "uint256", name: "requestId",    type: "uint256" },
+      { indexed: true,  internalType: "bytes32", name: "credentialId", type: "bytes32" },
+      { indexed: true,  internalType: "address", name: "candidate",    type: "address" },
+      { indexed: false, internalType: "uint256", name: "timestamp",    type: "uint256" },
+    ],
+    name: "VerificationRequested",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "uint256", name: "requestId",    type: "uint256" },
+      { indexed: true,  internalType: "bytes32", name: "credentialId", type: "bytes32" },
+      { indexed: true,  internalType: "address", name: "verifier",     type: "address" },
+      { indexed: false, internalType: "string",  name: "note",         type: "string"  },
+      { indexed: false, internalType: "uint256", name: "timestamp",    type: "uint256" },
+    ],
+    name: "VerificationApproved",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true,  internalType: "uint256", name: "requestId",    type: "uint256" },
+      { indexed: true,  internalType: "bytes32", name: "credentialId", type: "bytes32" },
+      { indexed: true,  internalType: "address", name: "verifier",     type: "address" },
+      { indexed: false, internalType: "string",  name: "reason",       type: "string"  },
+      { indexed: false, internalType: "uint256", name: "timestamp",    type: "uint256" },
+    ],
+    name: "VerificationRejected",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "verifier", type: "address" },
+      { indexed: true, internalType: "address", name: "addedBy",  type: "address" },
+    ],
+    name: "VerifierAdded",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "verifier",  type: "address" },
+      { indexed: true, internalType: "address", name: "removedBy", type: "address" },
+    ],
+    name: "VerifierRemoved",
+    type: "event",
+  },
+] as Abi;

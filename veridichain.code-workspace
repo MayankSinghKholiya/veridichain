@@ -1,0 +1,74 @@
+{
+  "folders": [
+    { "name": "VeridiChain Root",  "path": "."           },
+    { "name": "Contracts",         "path": "./contracts" },
+    { "name": "Frontend",          "path": "./frontend"  },
+    { "name": "Backend",           "path": "./backend"   }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "solidity.compileUsingRemoteVersion": "v0.8.20",
+    "solidity.defaultCompiler": "remote",
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/artifacts": true,
+      "**/cache": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "JuanBlanco.solidity",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "Prisma.prisma",
+      "bradlc.vscode-tailwindcss",
+      "formulahendry.auto-rename-tag",
+      "ms-vscode.vscode-typescript-next"
+    ]
+  },
+  "launch": {
+    "configurations": [
+      {
+        "name": "Backend (Node.js)",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/backend/src/index.js",
+        "envFile": "${workspaceFolder}/backend/.env",
+        "console": "integratedTerminal"
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Install All",
+        "type": "shell",
+        "command": "npm run install:all",
+        "group": "build"
+      },
+      {
+        "label": "Start Local Chain",
+        "type": "shell",
+        "command": "cd contracts && npx hardhat node",
+        "group": "build"
+      },
+      {
+        "label": "Deploy Local",
+        "type": "shell",
+        "command": "cd contracts && npx hardhat run scripts/deploy.js --network localhost",
+        "group": "build"
+      },
+      {
+        "label": "Run Tests",
+        "type": "shell",
+        "command": "cd contracts && npx hardhat test",
+        "group": "test"
+      }
+    ]
+  }
+}
