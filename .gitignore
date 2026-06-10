@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Hardhat
+artifacts/
+cache/
+typechain/
+typechain-types/
+
+# Prisma
+backend/prisma/migrations/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Sensitive
+*.pem
+*.key
+
+# Generated / build artifacts
+*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
+.openzeppelin/
+*.code-workspace

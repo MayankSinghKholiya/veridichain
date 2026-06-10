@@ -1,0 +1,68 @@
+// IndexedDB cache for credential event logs.
+// Key format: "ce:{chainId}:{address}"
+// First load does a full scan and stores results here; subsequent loads do delta-sync only.
+
+const DB_NAME = "veridichain";
+const STORE   = "credEvents";
+
+export interface CredEventCache {
+  issued:    unknown[];
+  revoked:   unknown[];
+  upgraded:  unknown[];
+  fromBlock: number;
+  lastBlock: number;
+}
+
+function openIDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined" || !("indexedDB" in window)) {
+      reject(new Error("IndexedDB unavailable"));
+      return;
+    }
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(STORE);
+    req.onsuccess       = () => resolve(req.result);
+    req.onerror         = () => reject(req.error);
+  });
+}
+
+export async function idbGet(key: string): Promise<CredEventCache | null> {
+  try {
+    const db = await openIDB();
+    return new Promise((res) => {
+      const req = db.transaction(STORE, "readonly").objectStore(STORE).get(key);
+      req.onsuccess = () => res((req.result as CredEventCache) ?? null);
+      req.onerror   = () => res(null);
+    });
+  } catch {
+    return null;
+  }
+}
+
+// Fails silently — caching is best-effort, never crash the app over it
+export async function idbSet(key: string, val: CredEventCache): Promise<void> {
+  try {
+    const db = await openIDB();
+    await new Promise<void>((res, rej) => {
+      const tx  = db.transaction(STORE, "readwrite");
+      const req = tx.objectStore(STORE).put(val, key);
+      req.onsuccess = () => res();
+      req.onerror   = () => rej(req.error);
+    });
+  } catch {
+    /* best-effort */
+  }
+}
+
+export async function idbDel(key: string): Promise<void> {
+  try {
+    const db = await openIDB();
+    await new Promise<void>((res) => {
+      const req = db.transaction(STORE, "readwrite").objectStore(STORE).delete(key);
+      req.onsuccess = () => res();
+      req.onerror   = () => res();
+    });
+  } catch {
+    /* best-effort */
+  }
+}
