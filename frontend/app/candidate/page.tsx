@@ -739,6 +739,15 @@ export default function CandidatePage() {
           localStorage.setItem(lsKey, JSON.stringify({
             verified: true, did: data.did, claims: data.claims,
           }));
+        } else {
+          // No name from server but wallet IS verified — still mark verified in localStorage
+          // so the institution page role-conflict check can detect this wallet is a candidate.
+          try {
+            const existing = JSON.parse(localStorage.getItem(lsKey) ?? "{}") as { verified?: boolean };
+            if (!existing.verified) {
+              localStorage.setItem(lsKey, JSON.stringify({ verified: true, did: data.did ?? "" }));
+            }
+          } catch { /* ignore */ }
         }
       } else {
         setIsQIEPassVerified(false);
