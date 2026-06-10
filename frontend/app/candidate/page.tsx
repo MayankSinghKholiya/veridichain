@@ -2347,7 +2347,7 @@ export default function CandidatePage() {
                             </p>
                           ) : nameMatch === false ? (
                             <p className="text-amber-400 text-xs mt-1.5 flex items-center gap-1">
-                              ⚠️ Name doesn&apos;t match QIE Pass — enter your full name exactly as registered
+                              ⚠️ Name doesn&apos;t match QIE Pass — expected: &quot;{[qiePassFirst, qiePassLast].filter(Boolean).join(" ") || "unknown"}&quot;
                             </p>
                           ) : null
                         )}
