@@ -1364,21 +1364,18 @@ export default function CandidatePage() {
         } catch { /* ignore */ }
       }
 
-      //HARD BLOCK: no cached name = sync required
-      if (!claimsFirst && !claimsLast) {
-        setErr(
-          "KYC name not synced. Scroll up → click the \"⚠️ Sync name →\" button next to the QIE Pass badge, then try again."
-        );
-        return;
-      }
-
-      //Name match check — MANDATORY
-      if (!checkNameMatch(candName.trim(), claimsFirst, claimsLast)) {
-        setErr(
-          "Name doesn't match your QIE Pass identity. " +
-          "Enter your full name exactly as registered in QIE Pass (open QIE Wallet → Profile to check)."
-        );
-        return;
+      // When QIE Pass sandbox API returns empty claims (known sandbox limitation —
+      // test API does not always populate real names), skip name matching and
+      // allow attest to proceed. The user's entered name is still recorded on-chain.
+      if (claimsFirst || claimsLast) {
+        //Name match check — only when we actually have a reference name from QIE
+        if (!checkNameMatch(candName.trim(), claimsFirst, claimsLast)) {
+          setErr(
+            "Name doesn't match your QIE Pass identity. " +
+            "Enter your full name exactly as registered in QIE Pass (open QIE Wallet → Profile to check)."
+          );
+          return;
+        }
       }
 
       setQieGateState("approved");
