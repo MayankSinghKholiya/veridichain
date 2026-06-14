@@ -706,27 +706,9 @@ export default function CandidatePage() {
       if (data.verified) {
         const hasServerName = !!(data.claims?.firstName || data.claims?.lastName);
 
-        // Expiry check — read ONLY the chain-scoped localStorage key.
-        // Legacy keys are intentionally NOT read here so old testnet data cannot
-        // satisfy hasLocalName and silently prevent the auto-reset on mainnet.
-        const vcIsExpired = data.vcExpiresAt
-          ? new Date(data.vcExpiresAt).getTime() < Date.now()
-          : false;
-        const localRaw = (() => { try { return localStorage.getItem(lsKey); } catch { return null; } })();
-        const localParsed = localRaw ? (JSON.parse(localRaw) as { claims?: Record<string, unknown> } | null) : null;
-        const hasLocalName = !!(
-          String(localParsed?.claims?.firstName ?? "").trim() ||
-          String(localParsed?.claims?.lastName  ?? "").trim()
-        );
-
-        if (vcIsExpired && !hasServerName && !hasLocalName) {
-          // VC expired + no name anywhere → reset so QIEPassVerify shows
-          try { localStorage.removeItem(lsKey); } catch { /* ignore */ }
-          setIsQIEPassVerified(false);
-          setKycUnverifiedReason("expired");
-          return;
-        }
-
+        // Once QIE Pass verifies a wallet, treat it as permanently verified on our side.
+        // VC expiry is QIE's lifecycle concern — our dApp only needs to know the wallet
+        // passed KYC at least once.
         setIsQIEPassVerified(true);
         setKycUnverifiedReason(null);
         if (data.did) setQiePassDid(data.did);
@@ -846,15 +828,14 @@ export default function CandidatePage() {
         : false;
 
       if (vcIsExpired) {
-        // VC expired → reset verification state so QIEPassVerify shows for fresh verification.
-        // Old VC claims are permanently gone — user must go through a fresh QIE Pass flow.
-        try { localStorage.removeItem(`qiepass:candidate:${QIE_CHAIN_ID}:${address.toLowerCase()}`); } catch { /* ignore */ }
-        setIsQIEPassVerified(false);
-        setQiePassDid("");
-        setQiePassFirst("");
-        setQiePassLast("");
+        // VC expired but wallet was verified — keep verified status.
+        // Name sync can't retrieve claims from an expired VC; surface a gentle message.
+        setErr(
+          "Name could not be synced — the QIE Pass VC has expired. " +
+          "Your verified status is kept. Contact support if your name is missing."
+        );
         setSyncingName(false);
-        return; // QIEPassVerify component now shows — user can click "Verify with QIE Pass →"
+        return;
       }
 
       // VC still active (or expiry unknown) — name cannot be retrieved until it expires
