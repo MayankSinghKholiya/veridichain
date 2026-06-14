@@ -13,6 +13,12 @@ import { useEffect, useState } from "react";
 import { useConnect } from "wagmi";
 import { showToast } from "./toast";
 
+// QIE Wallet's WalletConnect deep-link scheme (from the WalletConnect wallet
+// registry). On mobile we skip the WC modal entirely and open the QIE Wallet app
+// directly with the pairing URI — far more reliable than the in-browser modal,
+// which fails to initialize inside mobile browsers.
+const QIE_WC_DEEPLINK = "qiemobilewalletconnect://wc?uri=";
+
 export type WalletOptionKind = "injected" | "walletconnect" | "qie-deeplink";
 
 export interface WalletOption {
@@ -69,6 +75,30 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
       },
     );
 
+  // Mobile WalletConnect: don't rely on the modal (it fails inside mobile
+  // browsers). Capture the pairing URI the connector emits and deep-link
+  // straight into the QIE Wallet app.
+  const connectViaQieDeeplink = (connector: Parameters<typeof connect>[0]["connector"]) => {
+    type WcMessage = { type: string; data?: unknown };
+    const emitter = (connector as unknown as {
+      emitter?: {
+        on:  (e: "message", l: (p: WcMessage) => void) => void;
+        off: (e: "message", l: (p: WcMessage) => void) => void;
+      };
+    }).emitter;
+    if (!emitter) { connectWith(connector); return; }
+    const onMessage = (payload: WcMessage) => {
+      if (payload?.type === "display_uri" && typeof payload.data === "string") {
+        emitter.off("message", onMessage);
+        window.location.href = QIE_WC_DEEPLINK + encodeURIComponent(payload.data);
+      }
+    };
+    emitter.on("message", onMessage);
+    // Safety: stop listening if no URI arrives (e.g. user cancels).
+    setTimeout(() => emitter.off("message", onMessage), 60_000);
+    connectWith(connector);
+  };
+
   const options: WalletOption[] = [];
 
   if (env) {
@@ -86,41 +116,38 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
 
     const wcOption: WalletOption | null = wcConn ? {
       id: "walletconnect",
-      label: "WalletConnect",
-      sublabel: env.mobile ? "Open your wallet app" : "Scan QR with your phone",
+      label: env.mobile ? "Connect QIE Wallet" : "WalletConnect",
+      sublabel: env.mobile ? "Opens the QIE Wallet app" : "Scan QR with your phone",
       icon: "📱",
       kind: "walletconnect",
-      run: () => connectWith(wcConn),
+      // Mobile → deep-link into the QIE Wallet app; desktop → WC modal/QR.
+      run: () => (env.mobile ? connectViaQieDeeplink(wcConn) : connectWith(wcConn)),
     } : null;
 
-    // On mobile, WalletConnect is the reliable path → make it primary.
-    // On desktop, the browser extension (injected) is the natural primary.
-    const ordered = env.mobile ? [wcOption, injectedOption] : [injectedOption, wcOption];
-    for (const opt of ordered) if (opt) options.push(opt);
+    if (env.mobile) {
+      // Mobile: WalletConnect (deep-link) is the only reliable path. Injected
+      // providers on mobile browsers are unreliable stubs, so don't offer them.
+      if (wcOption) options.push(wcOption);
 
-    // 3. Open in QIE Wallet in-app browser (mobile + configured scheme only).
-    const qieLink = env.mobile ? buildQieDeeplink() : null;
-    if (qieLink) {
-      options.push({
-        id: "qie-deeplink",
-        label: "Open in QIE Wallet",
-        sublabel: "Opens this page in QIE Wallet's browser",
-        icon: "🪪",
-        kind: "qie-deeplink",
-        run: () => { window.location.href = qieLink; },
-      });
-    }
+      // Optional: open this page inside QIE Wallet's in-app browser (env-scheme).
+      const qieLink = buildQieDeeplink();
+      if (qieLink) {
+        options.push({
+          id: "qie-deeplink",
+          label: "Open in QIE Wallet browser",
+          sublabel: "Opens this page inside QIE Wallet",
+          icon: "🪪",
+          kind: "qie-deeplink",
+          run: () => { window.location.href = qieLink; },
+        });
+      }
 
-    // Fallback: nothing offered yet (e.g. mobile, no WC project ID, no QIE scheme)
-    // — still attempt the injected connector so the button is never a dead end.
-    if (options.length === 0 && injectedConn) {
-      options.push({
-        id: "injected",
-        label: "Connect Wallet",
-        icon: "🔗",
-        kind: "injected",
-        run: () => connectWith(injectedConn),
-      });
+      // Last resort only if WC isn't configured — still let a real in-app wallet try.
+      if (options.length === 0 && injectedOption) options.push(injectedOption);
+    } else {
+      // Desktop: browser extension first, WalletConnect (QR) second.
+      if (injectedOption) options.push(injectedOption);
+      if (wcOption) options.push(wcOption);
     }
   }
 
