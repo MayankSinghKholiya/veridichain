@@ -135,7 +135,7 @@ When an institution is rejected while still pending, their WQIE is returned. Sam
 - Credential revocation UI — contract supports it, frontend doesn't expose it yet
 - QIE Pass state is in localStorage — breaks across devices/browsers
 - Smart contract verification on QIE explorer is broken server-side (Blockscout Rust verifier doesn't complete jobs for multi-file contracts). Bytecode matches exactly — see `contracts/CONTRACTS.md`.
-- No WalletConnect yet, so mobile users are out
+- WalletConnect is wired up for mobile (set `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` from cloud.reown.com); without a project ID it falls back to desktop injected only
 
 ---
 

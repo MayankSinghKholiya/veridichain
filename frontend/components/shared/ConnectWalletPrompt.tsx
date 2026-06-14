@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { injected } from "wagmi/connectors";
 import { useConnect } from "wagmi";
+import { useWalletOptions } from "../../lib/useWalletOptions";
 
 interface Props {
   title?: string;
@@ -15,7 +15,8 @@ export function ConnectWalletPrompt({
   title = "Connect Wallet",
   description = "Connect your wallet to view your credentials",
 }: Props) {
-  const { connect, isPending } = useConnect();
+  const { isPending } = useConnect();
+  const { options } = useWalletOptions();
 
   return (
     <div className="flex items-center justify-center min-h-[60vh] px-4">
@@ -61,19 +62,37 @@ export function ConnectWalletPrompt({
           <p className="text-white/40 text-sm leading-relaxed mb-8">{description}</p>
         </div>
 
-        {/* Connect button */}
-        <button
-          onClick={() => connect({ connector: injected() })}
-          disabled={isPending}
-          className="relative z-10 w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-white text-sm transition-all disabled:opacity-60 hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: "linear-gradient(135deg, #F72585, #7C3AED)",
-            boxShadow: "0 4px 24px rgba(247,37,133,0.4), 0 0 0 1px rgba(247,37,133,0.2)",
-          }}
-        >
-          <Image src="/qie-logo.svg" alt="" width={18} height={18} />
-          {isPending ? "Connecting…" : "Connect QIE Wallet"}
-        </button>
+        {/* Connect options — first is the primary (QIE-branded) button */}
+        <div className="relative z-10 space-y-2.5">
+          {options.map((opt, i) =>
+            i === 0 ? (
+              <button
+                key={opt.id}
+                onClick={opt.run}
+                disabled={isPending}
+                className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-white text-sm transition-all disabled:opacity-60 hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: "linear-gradient(135deg, #F72585, #7C3AED)",
+                  boxShadow: "0 4px 24px rgba(247,37,133,0.4), 0 0 0 1px rgba(247,37,133,0.2)",
+                }}
+              >
+                <Image src="/qie-logo.svg" alt="" width={18} height={18} />
+                {isPending ? "Connecting…" : opt.label === "Browser Wallet" ? "Connect QIE Wallet" : opt.label}
+              </button>
+            ) : (
+              <button
+                key={opt.id}
+                onClick={opt.run}
+                disabled={isPending}
+                className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-semibold text-white/85 text-sm transition-all disabled:opacity-60 hover:bg-white/[0.04] active:scale-[0.98]"
+                style={{ border: "1px solid rgba(247,37,133,0.22)", background: "rgba(247,37,133,0.04)" }}
+              >
+                <span className="text-base leading-none">{opt.icon}</span>
+                {opt.label}
+              </button>
+            )
+          )}
+        </div>
 
         {/* Divider */}
         <div className="relative z-10 flex items-center gap-3 my-5">

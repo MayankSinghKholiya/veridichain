@@ -7,7 +7,6 @@ import {
   useReadContract, useWriteContract, useWaitForTransactionReceipt,
   usePublicClient,
 } from "wagmi";
-import { injected } from "wagmi/connectors";
 import { Navbar } from "../../components/shared/Navbar";
 import { ConnectWalletPrompt } from "../../components/shared/ConnectWalletPrompt";
 import {

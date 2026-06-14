@@ -8,7 +8,6 @@ import {
   useReadContract, useWriteContract, useWaitForTransactionReceipt,
   usePublicClient,
 } from "wagmi";
-import { injected } from "wagmi/connectors";
 import { qieTestnet, QIE_CHAIN_ID, QIE_CHAIN_NAME, QIE_RPC, QIE_EXPLORER } from "../../lib/wagmi";
 import { Navbar } from "../../components/shared/Navbar";
 import { useLang } from "../../lib/LangContext";

@@ -4,10 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAccount, useConnect, useDisconnect, useChainId } from "wagmi";
-import { injected } from "wagmi/connectors";
 import { useState, useEffect, useRef } from "react";
 import { showToast } from "../../lib/toast";
 import { QIE_CHAIN_ID } from "../../lib/wagmi";
+import { useWalletOptions } from "../../lib/useWalletOptions";
 
 const ROLE_CONFIG = {
   candidate:   { label: "Candidate",   icon: "🎓", color: "rgba(139,92,246,0.15)", border: "rgba(139,92,246,0.3)", text: "#c084fc" },
@@ -17,9 +17,10 @@ const ROLE_CONFIG = {
 export function Navbar() {
   const pathname = usePathname();
   const { address, isConnected } = useAccount();
-  const { connect }    = useConnect();
+  const { isPending } = useConnect();
   const { disconnect } = useDisconnect();
   const chainId = useChainId();
+  const { options: walletOptions } = useWalletOptions();
 
   // Show "wrong network" warning if user is on neither testnet nor mainnet
   const isOnQIEChain = !isConnected || chainId === QIE_CHAIN_ID;
@@ -28,7 +29,9 @@ export function Navbar() {
   const [addrCopied, setAddrCopied] = useState(false);
   const [walletRole, setWalletRole] = useState<"candidate" | "institution" | null>(null);
   const [menuOpen,   setMenuOpen]   = useState(false);
+  const [connectOpen, setConnectOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const connectRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -46,6 +49,27 @@ export function Navbar() {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
+
+  // Close connect popover when clicking outside
+  useEffect(() => {
+    if (!connectOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (connectRef.current && !connectRef.current.contains(e.target as Node)) {
+        setConnectOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [connectOpen]);
+
+  // One option → connect directly; multiple → open the chooser popover.
+  function handleConnectClick() {
+    if (walletOptions.length === 1) {
+      walletOptions[0].run();
+    } else if (walletOptions.length > 1) {
+      setConnectOpen((o) => !o);
+    }
+  }
 
   // Detect wallet role from localStorage — updates when address changes
   // Checks new chain-scoped key first, then legacy key (migration)
@@ -201,12 +225,42 @@ export function Navbar() {
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => connect({ connector: injected() })}
-              className="btn-primary text-white px-5 py-2 rounded-xl text-sm font-semibold"
-            >
-              {mounted ? "Connect Wallet" : "Connect Wallet"}
-            </button>
+            <div className="relative" ref={connectRef}>
+              <button
+                onClick={handleConnectClick}
+                disabled={isPending}
+                className="btn-primary text-white px-5 py-2 rounded-xl text-sm font-semibold disabled:opacity-60"
+              >
+                {isPending ? "Connecting…" : "Connect Wallet"}
+              </button>
+
+              {/* Connect method chooser */}
+              {connectOpen && walletOptions.length > 1 && (
+                <div
+                  className="absolute right-0 mt-2 w-64 rounded-2xl border border-white/[0.08] p-1.5 z-50"
+                  style={{ background: "rgba(2,8,23,0.98)", backdropFilter: "blur(16px)", boxShadow: "0 16px 40px rgba(0,0,0,0.5)" }}
+                >
+                  <p className="text-white/35 text-[10px] font-bold uppercase tracking-[0.15em] px-3 pt-2 pb-1.5">
+                    Connect with
+                  </p>
+                  {walletOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => { opt.run(); setConnectOpen(false); }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-white/[0.06] transition-colors"
+                    >
+                      <span className="text-xl leading-none shrink-0">{opt.icon}</span>
+                      <span className="min-w-0">
+                        <span className="block text-white text-sm font-semibold">{opt.label}</span>
+                        {opt.sublabel && (
+                          <span className="block text-white/35 text-xs truncate">{opt.sublabel}</span>
+                        )}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

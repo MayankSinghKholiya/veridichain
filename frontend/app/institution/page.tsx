@@ -7,7 +7,6 @@ import {
   useAccount, useConnect, useDisconnect, useChainId, useSwitchChain,
   useReadContract, useWriteContract, useWaitForTransactionReceipt,
 } from "wagmi";
-import { injected } from "wagmi/connectors";
 import { qieTestnet } from "../../lib/wagmi";
 import { Navbar } from "../../components/shared/Navbar";
 import { useLang } from "../../lib/LangContext";

@@ -1,6 +1,6 @@
 import { createConfig, http, fallback } from "wagmi";
 import { defineChain, custom } from "viem";
-import { injected } from "wagmi/connectors";
+import { injected, walletConnect } from "wagmi/connectors";
 
 // To deploy on mainnet, just change these env vars:
 //   NEXT_PUBLIC_QIE_CHAIN_ID=1990
@@ -63,13 +63,42 @@ function makeTransport() {
   ]);
 }
 
-// Wagmi config — QIE Wallet / any injected wallet
+// WalletConnect project ID — get a free one at https://cloud.reown.com
+// (formerly cloud.walletconnect.com). Required ONLY for mobile / QR connections.
+// When empty, the WalletConnect connector is simply not added, so the desktop
+// injected flow keeps working exactly as before — no regression.
+export const WC_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
+
+// Where the dApp is hosted — used in WalletConnect metadata shown to the wallet.
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://veridichain-ivory.vercel.app";
+
+// Connectors:
+//   • injected()      — desktop extensions + any wallet in-app browser (window.ethereum)
+//   • walletConnect() — mobile wallets via QR scan (desktop) or app deep-link (mobile)
+// WalletConnect is added only when a project ID is configured.
+const connectors = [
+  // Supports any injected wallet: QIE Wallet, OKX, MetaMask, Rabby, etc.
+  injected(),
+  ...(WC_PROJECT_ID
+    ? [
+        walletConnect({
+          projectId: WC_PROJECT_ID,
+          showQrModal: true,
+          metadata: {
+            name: "VeridiChain",
+            description: "Decentralized credential verification on QIE Blockchain",
+            url: APP_URL,
+            icons: [`${APP_URL}/icon.png`],
+          },
+        }),
+      ]
+    : []),
+];
+
+// Wagmi config — QIE Wallet / any injected wallet + WalletConnect (mobile)
 export const wagmiConfig = createConfig({
   chains: [qieTestnet],
-  connectors: [
-    // Supports any injected wallet: QIE Wallet, OKX, MetaMask, Rabby, etc.
-    injected(),
-  ],
+  connectors,
   transports: {
     [qieTestnet.id]: makeTransport(),
   },

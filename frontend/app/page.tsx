@@ -3,8 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useAccount, useConnect, useDisconnect, useReadContract } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { useAccount, useDisconnect, useReadContract } from "wagmi";
+import { useWalletOptions } from "../lib/useWalletOptions";
 import { Navbar } from "../components/shared/Navbar";
 import {
   CONTRACTS,
@@ -189,7 +189,7 @@ function VideoCard({
 /* Main landing page */
 export default function HomePage() {
   const { address, isConnected } = useAccount();
-  const { connect }    = useConnect();
+  const { options: walletOptions } = useWalletOptions();
   const { disconnect } = useDisconnect();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -669,7 +669,7 @@ export default function HomePage() {
                   <Link href="/candidate"   className="glass glass-hover text-white px-8 py-3.5 rounded-2xl font-semibold transition-all">View My Credentials</Link>
                 </>
               ) : (
-                <button onClick={() => connect({ connector: injected() })} className="btn-primary text-white px-10 py-4 rounded-2xl font-semibold text-lg">
+                <button onClick={() => walletOptions[0]?.run()} disabled={walletOptions.length === 0} className="btn-primary text-white px-10 py-4 rounded-2xl font-semibold text-lg disabled:opacity-60">
                   Connect Wallet to Start
                 </button>
               )}
