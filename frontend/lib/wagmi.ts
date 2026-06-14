@@ -51,16 +51,14 @@ export const qieTestnet = defineChain({
 // Writes always go through the injected connector — the transport only matters
 // for reads and receipt polling, so this change does not affect sending txs.
 function makeTransport() {
-  // On the server (SSR), window.ethereum doesn't exist — use http only.
-  if (typeof window === "undefined") {
-    return http(QIE_RPC);
+  if (typeof window === "undefined") return http(QIE_RPC);
+  // Only include custom() when a real wallet provider exists.
+  // custom(undefined) crashes on iOS Safari when the fallback is tried.
+  const eth = (window as any).ethereum;
+  if (eth && typeof eth.request === "function") {
+    return fallback([http(QIE_RPC), custom(eth)]);
   }
-  // HTTP RPC first → reliable eth_call results.
-  // Wallet provider second → fallback if RPC is down.
-  return fallback([
-    http(QIE_RPC),
-    custom(window.ethereum as any),
-  ]);
+  return http(QIE_RPC);
 }
 
 // WalletConnect project ID — get a free one at https://cloud.reown.com

@@ -17,7 +17,7 @@ import { QIE_CHAIN_ID, QIE_CHAIN_NAME, QIE_EXPLORER } from "../lib/wagmi";
 /* Credential card preview shown in hero section */
 function CredentialCardMockup() {
   return (
-    <div className="animate-float relative" style={{ perspective: "1000px" }}>
+    <div className="animate-float relative">
       <div
         className="absolute animate-orb pointer-events-none"
         style={{
