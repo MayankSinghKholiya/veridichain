@@ -22,6 +22,12 @@
     "viem": "^2.12.0",
     "wagmi": "^2.9.0"
   },
+  "comments": {
+    "overrides": "Pin WalletConnect's provider to the last version that uses the battle-tested @walletconnect/modal instead of @reown/appkit. The @reown/appkit auto-modal fails to initialize on mobile browsers (iOS Safari + Android), causing the provider to be undefined and connect() to throw 'e.request'. Desktop is unaffected either way."
+  },
+  "overrides": {
+    "@walletconnect/ethereum-provider": "2.19.2"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.3.0",
