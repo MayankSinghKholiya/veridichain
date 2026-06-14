@@ -1516,18 +1516,33 @@ export default function CandidatePage() {
                     <span className="text-green-300/30 text-xs">🔒</span>
                   </div>
                 ) : kycUnverifiedReason === "expired" ? (
-                  <div className="glass rounded-2xl px-4 py-3 border-amber-500/20 max-w-xs"
-                    style={{ background: "rgba(245,158,11,0.06)" }}>
-                    <p className="text-amber-300 text-xs font-semibold mb-1">⏳ QIE Pass VC Expired</p>
-                    <p className="text-amber-300/50 text-xs leading-relaxed mb-2">
-                      Your KYC was verified but the VC has expired. Open QIE Wallet → QIE Pass → Verify again.
-                      QIE needs ~1–2 hours after expiry before a new VC can be issued.
-                    </p>
-                    <button
-                      onClick={() => address && runQIEPassCheck(address)}
-                      className="text-xs text-amber-400 border border-amber-500/30 px-3 py-1 rounded-lg hover:bg-amber-500/10 transition-all">
-                      🔄 Check again
-                    </button>
+                  <div className="max-w-xs w-full space-y-2.5">
+                    <div className="glass rounded-2xl px-4 py-3 border-amber-500/20"
+                      style={{ background: "rgba(245,158,11,0.06)" }}>
+                      <p className="text-amber-300 text-xs font-semibold mb-1">⏳ QIE Pass VC Expired</p>
+                      <p className="text-amber-300/50 text-xs leading-relaxed mb-2">
+                        Your KYC was verified but the VC has expired. Re-verify below to issue a fresh one.
+                        QIE needs ~1–2 hours after expiry before a new VC can be issued.
+                      </p>
+                      <button
+                        onClick={() => address && runQIEPassCheck(address)}
+                        className="text-xs text-amber-400 border border-amber-500/30 px-3 py-1 rounded-lg hover:bg-amber-500/10 transition-all">
+                        🔄 Check again
+                      </button>
+                    </div>
+                    {/* Full re-verify flow so the user can renew an expired VC in-app */}
+                    <QIEPassVerify
+                      address={address}
+                      role="candidate"
+                      requestedClaims={["firstName", "lastName", "age_over_18"]}
+                      onVerified={(did, claims) => {
+                        setIsQIEPassVerified(true);
+                        setKycUnverifiedReason(null);
+                        setQiePassDid(did);
+                        setQiePassFirst(stripQIEPlaceholders(String((claims as any)?.firstName ?? "")));
+                        setQiePassLast(stripQIEPlaceholders(String((claims as any)?.lastName  ?? "")));
+                      }}
+                    />
                   </div>
                 ) : (
                   <div className="max-w-xs w-full">
