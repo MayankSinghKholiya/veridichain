@@ -276,6 +276,53 @@ export default function HomePage() {
     },
   ];
 
+  const ecosystemItems = [
+    {
+      icon: "🎫",
+      title: "QIE Pass",
+      desc: "On-chain KYC identity required for institution registration. Only KYC-verified institutions with a valid QIE Pass can issue credentials on VeridiChain.",
+      badge: "Identity",
+      iconBg: "rgba(14,165,233,0.15)",
+      iconBorder: "rgba(14,165,233,0.3)",
+      badgeBg: "rgba(14,165,233,0.08)",
+      badgeBorder: "rgba(14,165,233,0.2)",
+      badgeColor: "#7dd3fc",
+    },
+    {
+      icon: "📱",
+      title: "QIE Wallet",
+      desc: "The native mobile wallet for the QIE network. Connect to VeridiChain directly from your phone — no browser extension required.",
+      badge: "Wallet",
+      iconBg: "rgba(129,140,248,0.15)",
+      iconBorder: "rgba(129,140,248,0.3)",
+      badgeBg: "rgba(129,140,248,0.08)",
+      badgeBorder: "rgba(129,140,248,0.2)",
+      badgeColor: "#a5b4fc",
+    },
+    {
+      icon: "💵",
+      title: "QIE Stable Coin",
+      desc: "Institutions pay registration fees in QUSDC — the QIE network's stable currency. Predictable costs, no token price volatility.",
+      badge: "Payments",
+      iconBg: "rgba(34,197,94,0.15)",
+      iconBorder: "rgba(34,197,94,0.3)",
+      badgeBg: "rgba(34,197,94,0.08)",
+      badgeBorder: "rgba(34,197,94,0.2)",
+      badgeColor: "#86efac",
+    },
+    {
+      icon: "🔄",
+      title: "QIE Dex",
+      desc: "Swap between WQIE and QUSDC on the QIE decentralized exchange. Get the tokens needed for staking and registration fees without any third party.",
+      badge: "DeFi",
+      iconBg: "rgba(234,179,8,0.15)",
+      iconBorder: "rgba(234,179,8,0.3)",
+      badgeBg: "rgba(234,179,8,0.08)",
+      badgeBorder: "rgba(234,179,8,0.2)",
+      badgeColor: "#fde047",
+    },
+  ];
+
   const videos = [
     {
       icon: "🎓",
@@ -553,7 +600,7 @@ export default function HomePage() {
             <p className="text-white/40 mt-4 max-w-lg mx-auto">Three steps. End-to-end on the blockchain. No paperwork, no waiting.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            <div className="hidden md:block absolute top-10 left-1/6 right-1/6 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(14,165,233,0.3), transparent)" }} />
+            <div className="hidden md:block absolute top-10 h-px" style={{ left: "16.67%", right: "16.67%", background: "linear-gradient(to right, transparent, rgba(14,165,233,0.3), transparent)" }} />
             {steps.map((s, i) => (
               <div key={s.n} className="glass rounded-3xl p-8 relative hover:border-sky-500/20 transition-all">
                 <div className="flex items-center gap-4 mb-5">
@@ -568,6 +615,49 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-white font-bold text-lg mb-2">{s.title}</h3>
                 <p className="text-white/40 text-sm leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* QIE Ecosystem integrations */}
+      <section className="py-24 border-t border-white/[0.05] relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%,-50%)", width: 700, height: 400, background: "radial-gradient(ellipse, rgba(14,165,233,0.06) 0%, transparent 65%)", filter: "blur(2px)" }} />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <p className="text-sky-400 text-sm font-semibold uppercase tracking-widest mb-4">Ecosystem</p>
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Powered by <span className="gradient-text">QIE Ecosystem</span>
+            </h2>
+            <p className="text-white/40 max-w-xl mx-auto">
+              VeridiChain is natively integrated with core QIE infrastructure — from identity verification to payments and DeFi.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {ecosystemItems.map((item) => (
+              <div
+                key={item.title}
+                className="glass rounded-3xl p-7 hover:scale-[1.02] hover:border-sky-500/20 transition-all duration-300 flex flex-col"
+              >
+                <div className="flex items-start justify-between mb-5">
+                  <div style={{
+                    width: 52, height: 52, borderRadius: 16,
+                    background: item.iconBg, border: `1px solid ${item.iconBorder}`,
+                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+                  }}>{item.icon}</div>
+                  <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{
+                    background: item.badgeBg, border: `1px solid ${item.badgeBorder}`, color: item.badgeColor,
+                  }}>{item.badge}</span>
+                </div>
+                <h3 className="text-white font-bold text-base mb-2">{item.title}</h3>
+                <p className="text-white/45 text-xs leading-relaxed flex-1">{item.desc}</p>
+                <div className="mt-5 pt-4 border-t border-white/[0.06] flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  <span className="text-green-400/70 text-xs font-medium">Integrated</span>
+                </div>
               </div>
             ))}
           </div>
