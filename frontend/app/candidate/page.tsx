@@ -268,14 +268,11 @@ function CredentialCard({
   credentialId: `0x${string}`;
   eventData: CredEventData | undefined;
   onRevoked: () => void;
-  /** True when the wallet owner has a verified QIE Pass in localStorage */
   isQIEVerified?: boolean;
   hasTeamVerification?: boolean;
   hasPendingRequest?: boolean;
   onRequestVerification?: () => void;
-  /** Pre-fetched by parent to avoid per-card flickering */
   tokenId?: bigint | null;
-  /** IPFS CID of the encrypted metadata JSON — used to derive doc type */
   ipfsCid?: string | null;
 }) {
   const { tr } = useLang();
@@ -287,8 +284,6 @@ function CredentialCard({
   async function handleCopyLink() {
     setShareLoading(true);
     try {
-      // Fetch a server-signed HMAC token — only the server (which holds METADATA_ENC_KEY)
-      // can generate it, so no one can spoof the share link by guessing the token.
       const res = await fetch(`/api/share-token?credId=${credentialId}`);
       const { token } = await res.json() as { token?: string };
       const url = token
@@ -298,7 +293,6 @@ function CredentialCard({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback: copy plain link (no details unlocked)
       navigator.clipboard.writeText(`${window.location.origin}/verify?id=${credentialId}`).catch(() => {});
     } finally {
       setShareLoading(false);
@@ -321,16 +315,13 @@ function CredentialCard({
   const { isLoading: revokeWaiting, isSuccess: revokeOk } =
     useWaitForTransactionReceipt({ hash: revokeHash });
 
-  // After revoke confirmed — notify parent to refresh
   useEffect(() => {
     if (revokeOk) { onRevoked(); }
   }, [revokeOk]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Token ID comes from parent batch fetch — no per-card RPC call needed
-  const tokenId    = tokenIdProp !== undefined ? tokenIdProp : null;
+  const tokenId      = tokenIdProp !== undefined ? tokenIdProp : null;
   const tokenLoading = tokenIdProp === undefined;
 
-  // Credential type — fetched lazily from IPFS (only the public `type` field)
   const [credType, setCredType] = useState<CredDocType | null>(null);
   useEffect(() => {
     if (!ipfsCid || credType) return;
@@ -348,7 +339,6 @@ function CredentialCard({
     setRevokeErr("");
     revokeReset();
 
-    // Force switch to correct QIE chain
     const eth = typeof window !== "undefined" ? (window as any).ethereum : null;
     const chainHex = "0x" + QIE_CHAIN_ID.toString(16);
     if (eth) {
@@ -377,7 +367,6 @@ function CredentialCard({
     });
   }
 
-  // Show skeleton only until we have the event data
   if (!eventData) {
     return (
       <div className="glass rounded-3xl p-6 animate-pulse">
@@ -642,33 +631,16 @@ export default function CandidatePage() {
   const [isBlockedByRole,   setIsBlockedByRole]   = useState(false);
 
   const [kycCheckLoading, setKycCheckLoading] = useState(false);
-  /** True while re-fetching QIE Pass name claims for already-verified users */
-  const [syncingName,   setSyncingName]   = useState(false);
-  /**
-   * "expired"  — QIE Pass VC is expired; user must re-verify after QIE cleanup
-   * "none"     — Wallet has never done QIE Pass verification
-   * null       — Unknown / still loading
-   */
+  const [syncingName,     setSyncingName]     = useState(false);
   const [kycUnverifiedReason, setKycUnverifiedReason] = useState<"expired" | "none" | null>(null);
 
-  // Check QIE Pass verification status when wallet connects
-  // 1. Fast hint from localStorage
-  // server-side check via QIE Pass API
-  /**
-   * Full QIE Pass verification check — used by the auto-check useEffect AND
-   * the manual "Check again" button. Always runs the complete logic including
-   * vcExpiresAt expiry detection and auto-reset. Never reads legacy localStorage
-   * keys on mainnet — testnet data must not bleed into mainnet.
-   */
   async function runQIEPassCheck(addr: string): Promise<void> {
     const lsKey = `qiepass:candidate:${QIE_CHAIN_ID}:${addr.toLowerCase()}`;
 
-    //Role conflict check
     try {
-      const instKey = `qiepass:institution:${QIE_CHAIN_ID}:${addr.toLowerCase()}`;
-      // On testnet only: also check legacy un-scoped key for migration
+      const instKey    = `qiepass:institution:${QIE_CHAIN_ID}:${addr.toLowerCase()}`;
       const instLegacy = QIE_CHAIN_ID !== 1990 ? `qiepass:institution:${addr.toLowerCase()}` : null;
-      const raw = localStorage.getItem(instKey) ?? (instLegacy ? localStorage.getItem(instLegacy) : null);
+      const raw        = localStorage.getItem(instKey) ?? (instLegacy ? localStorage.getItem(instLegacy) : null);
       if (raw && (JSON.parse(raw) as { verified?: boolean })?.verified) {
         setIsBlockedByRole(true);
         setIsQIEPassVerified(false);
@@ -676,9 +648,6 @@ export default function CandidatePage() {
       }
     } catch { /* ignore */ }
 
-    //Step 1: Optimistic localStorage hint (fast)
-    // Only read the chain-scoped key — NEVER fall back to legacy keys on mainnet.
-    // This prevents old testnet KYC from pre-populating the mainnet page.
     try {
       const raw = localStorage.getItem(lsKey);
       if (raw) {
@@ -694,10 +663,9 @@ export default function CandidatePage() {
       }
     } catch { /* ignore */ }
 
-    //Step 2: Authoritative server-side check
     setKycCheckLoading(true);
     try {
-      const r = await fetch(`/api/qiepass/candidate-verify?wallet=${addr.toLowerCase()}`);
+      const r    = await fetch(`/api/qiepass/candidate-verify?wallet=${addr.toLowerCase()}`);
       const data = await r.json() as {
         verified: boolean; did?: string | null; requestId?: string;
         vcExpiresAt?: string | null; claims?: Record<string, string> | null;
@@ -705,24 +673,14 @@ export default function CandidatePage() {
 
       if (data.verified) {
         const hasServerName = !!(data.claims?.firstName || data.claims?.lastName);
-
-        // Once QIE Pass verifies a wallet, treat it as permanently verified on our side.
-        // VC expiry is QIE's lifecycle concern — our dApp only needs to know the wallet
-        // passed KYC at least once.
         setIsQIEPassVerified(true);
         setKycUnverifiedReason(null);
         if (data.did) setQiePassDid(data.did);
-        // Only overwrite name state when server actually returned name values.
-        // Empty {} means claimAndVerify was already consumed — keep whatever is in state.
         if (hasServerName) {
           setQiePassFirst(stripQIEPlaceholders(String(data.claims!.firstName ?? "")));
           setQiePassLast(stripQIEPlaceholders(String(data.claims!.lastName  ?? "")));
-          localStorage.setItem(lsKey, JSON.stringify({
-            verified: true, did: data.did, claims: data.claims,
-          }));
+          localStorage.setItem(lsKey, JSON.stringify({ verified: true, did: data.did, claims: data.claims }));
         } else {
-          // No name from server but wallet IS verified — still mark verified in localStorage
-          // so the institution page role-conflict check can detect this wallet is a candidate.
           try {
             const existing = JSON.parse(localStorage.getItem(lsKey) ?? "{}") as { verified?: boolean };
             if (!existing.verified) {
@@ -732,7 +690,6 @@ export default function CandidatePage() {
         }
       } else {
         setIsQIEPassVerified(false);
-        // No QIE Pass record found for this wallet at all
         setKycUnverifiedReason("none");
       }
     } catch { /* network error — keep localStorage hint */ }
@@ -744,7 +701,6 @@ export default function CandidatePage() {
     runQIEPassCheck(address);
   }, [address, mounted]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset all QIE Pass state when wallet disconnects
   useEffect(() => {
     if (address) return;
     setIsQIEPassVerified(false);
@@ -756,16 +712,11 @@ export default function CandidatePage() {
     setKycCheckLoading(false);
   }, [address]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Sync name claims if the user is already verified but name was not captured
-  // Happens when claimAndVerify() was already consumed (single-use) so the
-  // server-side candidate-verify returns claims:{} — we lost the name.
-  // This handler re-tries all fallback paths to recover it.
   async function handleSyncName() {
     if (!address || syncingName) return;
     setSyncingName(true);
     setErr("");
     try {
-      //Step 1: re-run server authoritative check
       const cvRes = await fetch(`/api/qiepass/candidate-verify?wallet=${address.toLowerCase()}`);
       const cvData = await cvRes.json() as {
         verified: boolean; did?: string; requestId?: string;
@@ -786,7 +737,6 @@ export default function CandidatePage() {
         return;
       }
 
-      //Step 2: try fetch-claims with the stored requestId
       const rid = cvData.requestId ??
         (() => {
           try {
@@ -821,15 +771,12 @@ export default function CandidatePage() {
         }
       }
 
-      //Step 3: all paths exhausted — check if VC has expired
       const vcExpiresAt = cvData.vcExpiresAt;
       const vcIsExpired = vcExpiresAt
         ? new Date(vcExpiresAt).getTime() < Date.now()
         : false;
 
       if (vcIsExpired) {
-        // VC expired but wallet was verified — keep verified status.
-        // Name sync can't retrieve claims from an expired VC; surface a gentle message.
         setErr(
           "Name could not be synced — the QIE Pass VC has expired. " +
           "Your verified status is kept. Contact support if your name is missing."
@@ -838,7 +785,6 @@ export default function CandidatePage() {
         return;
       }
 
-      // VC still active (or expiry unknown) — name cannot be retrieved until it expires
       if (vcExpiresAt) {
         const expDate = new Date(vcExpiresAt);
         const dateStr = expDate.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -859,23 +805,17 @@ export default function CandidatePage() {
     setSyncingName(false);
   }
 
-  /* credEventMap: credentialId → credential data (directly from mapping read) */
   const [credEventMap,   setCredEventMap]   = useState<Map<string, CredEventData>>(new Map());
   const [eventsFetching, setEventsFetching] = useState(false);
-  /** Increment to force a re-fetch even when credIds.length hasn't changed */
-  const [fetchKey, setFetchKey] = useState(0);
+  const [fetchKey,       setFetchKey]       = useState(0);
 
-  /* Team verification maps */
   const [teamVerifMap,  setTeamVerifMap]  = useState<Map<string, boolean>>(new Map());
   const [pendingReqMap, setPendingReqMap] = useState<Map<string, boolean>>(new Map());
 
-  /* NFT token ID map — batch-fetched in parent to avoid per-card flicker */
   const [tokenIdMap, setTokenIdMap] = useState<Map<string, bigint>>(new Map());
-
-  /* IPFS CID map — batch-fetched so CredentialCard can derive doc type */
   const [ipfsCidMap, setIpfsCidMap] = useState<Map<string, string>>(new Map());
 
-  /* Structured attest form state */
+
   const [docType,     setDocType]     = useState<CredDocType | "">("");
   const [candName,    setCandName]    = useState("");
   const [institution, setInstitution] = useState("");
@@ -890,12 +830,10 @@ export default function CandidatePage() {
   const [courseName,  setCourseName]  = useState("");
   const [attestLoading, setAttestLoading] = useState(false);
 
-  /* Name gate — tracks QIE Pass name matching state during self-attest */
   type QIEGateState = "idle" | "requesting" | "polling" | "approved" | "rejected";
   const [qieGateState,     setQieGateState]     = useState<QIEGateState>("idle");
   const [qieGateRequestId, setQieGateRequestId] = useState("");
 
-  /* Fetched name claims from QIE Pass, used for self-attest name validation */
   const [qiePassFirst, setQiePassFirst] = useState("");
   const [qiePassLast,  setQiePassLast]  = useState("");
 
@@ -917,7 +855,6 @@ export default function CandidatePage() {
 
   const PORTFOLIO_LSKEY = (addr: string) => `vc:portfolios:${addr.toLowerCase()}`;
 
-  // Load stored portfolios from localStorage when wallet connects
   useEffect(() => {
     if (!address) return;
     try {
@@ -1008,11 +945,9 @@ export default function CandidatePage() {
   const [credFilter, setCredFilter] = useState<CredFilter>("all");
   const [credSort,   setCredSort]   = useState<CredSort>("newest");
 
-  /* Pagination */
   const PAGE_SIZE = 5;
   const [credPage, setCredPage] = useState(1);
 
-  /* Manual verification modal */
   const [verifModalCred, setVerifModalCred] = useState<`0x${string}` | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -1023,26 +958,19 @@ export default function CandidatePage() {
     functionName: "getCredentialsByCandidate",
     args: [address!],
     query: {
-      enabled: !!address,
-      // Always fetch fresh data — never serve a stale empty-array from cache.
-      staleTime: 0,
-      // Retry up to 3 times on error (covers transient RPC hiccups).
-      retry: 3,
+      enabled:    !!address,
+      staleTime:  0,
+      retry:      3,
       retryDelay: 1500,
     },
   });
 
-  // Log read errors to console so they're visible in DevTools
   useEffect(() => {
-    if (idsError) {
-      console.error("[CredRegistry] getCredentialsByCandidate error:", idsError);
-    }
+    if (idsError) console.error("[CredRegistry] getCredentialsByCandidate error:", idsError);
   }, [idsError]);
 
   const credIds = (ids as `0x${string}`[] | undefined) ?? [];
 
-  // credentials(bytes32) returns all data in one call — fire all in parallel.
-  // Replaced the old getLogs approach (120 sequential RPC calls) that was ~2min on mainnet.
   useEffect(() => {
     if (!publicClient || credIds.length === 0) return;
     let cancelled = false;
@@ -1066,7 +994,6 @@ export default function CandidatePage() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             }) as any;
 
-            //credEventMap
             evtMap.set(credId, {
               tier:      Number(raw?.tier      ?? raw?.[6] ?? 0),
               issuedAt:  Number(raw?.issuedAt  ?? raw?.[7] ?? 0),
@@ -1074,11 +1001,9 @@ export default function CandidatePage() {
               isRevoked: Boolean(raw?.isRevoked ?? raw?.[8] ?? false),
             });
 
-            //IPFS CID
             const ipfsCid = (raw?.ipfsCID ?? raw?.[1] ?? "") as string;
             if (ipfsCid) cidMap.set(credId, ipfsCid);
 
-            //NFT token ID (index 10 in the tuple)
             const nftTokenId = raw?.nftTokenId ?? raw?.[10];
             if (nftTokenId !== undefined && nftTokenId !== null) {
               tokMap.set(credId, BigInt(nftTokenId));
@@ -1163,8 +1088,6 @@ export default function CandidatePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicClient, credIds.length, isManualVerifDeployed]);
 
-  // tokenIdMap and ipfsCidMap are now populated inside fetchAllCredData above.
-
   const {
     writeContract: doAttest,
     data:      attHash,
@@ -1179,19 +1102,16 @@ export default function CandidatePage() {
   useEffect(() => {
     if (attOk) {
       refetchIds();
-      // Clear stale data + bump fetchKey so fetchAllCredData re-runs
       if (address) idbDel(`ce:${CACHE_CHAIN}:${address.toLowerCase()}`);
       setCredEventMap(new Map());
       setIpfsCidMap(new Map());
       setTokenIdMap(new Map());
       setEventsFetching(false);
       setFetchKey(k => k + 1);
-      // Reset attest form + gate state
       setDocType(""); setCandName(""); setInstitution(""); setIssueYear("");
       setHasBarcode(false); setBarcodeVal(""); setDocCID("");
       setDegreeType(""); setRole(""); setDateFrom(""); setDateTo(""); setCourseName("");
       setQieGateState("idle"); setQieGateRequestId("");
-      // Toast + auto-switch to credentials tab
       showToast("Credential attested on-chain! 🎉", "success");
       setTimeout(() => setTab("credentials"), 1800);
     }
@@ -1201,14 +1121,6 @@ export default function CandidatePage() {
     ? ((attError as any)?.shortMessage || (attError as any)?.message || "Transaction failed")
     : null;
 
-  // Name gate helpers
-
-  /**
-   * Strip QIE placeholder tokens that are not real name data.
-   * QIE Pass sometimes returns "Unknown" (or "N/A", "None") when a field
-   * is unavailable — e.g. lastName="KHOLIYA Unknown" or firstName="Unknown".
-   * These must be removed before any name comparison or display.
-   */
   function stripQIEPlaceholders(s: string): string {
     const PLACEHOLDERS = new Set(["unknown", "n/a", "null", "undefined", "none", "na"]);
     return s
@@ -1218,51 +1130,17 @@ export default function CandidatePage() {
       .join(" ");
   }
 
-  /**
-   * Word-level name match — every real word in the QIE Pass name must appear
-   * as a complete word in the entered name (case-insensitive), AND the entered
-   * name may have AT MOST 1 extra word (for middle names / suffixes).
-   * QIE placeholder tokens ("Unknown", "N/A" etc.) are stripped before matching.
-   *
-   * ✅ "Nishant Kholiya"       entered against QIE "Nishant Kholiya"
-   * ✅ "Nishant Kholiya"       entered against QIE "Nishant Kholiya Unknown" (placeholder stripped)
-   * ✅ "Nishant Kumar Kholiya" entered against QIE "Nishant Kholiya"  (1 extra middle word OK)
-   * ❌ "Nishant"               — "Kholiya" missing
-   * ❌ "N"                     — "n" ≠ "nishant", substring match NOT used
-   * ❌ ""                      — blank always blocked
-   * ❌ "Rahul Nishant Kholiya" against QIE "Nishant Kholiya" — 1 extra word "rahul" OK
-   *    but if QIE is only "Kholiya" then "Rahul Nishant Kholiya" → 2 extra words → ❌
-   *
-   * The extra-word limit closes the attack where someone appends the victim's
-   * full QIE name to their own (e.g. "Attacker Victim Name" passes naive check).
-   *
-   * Returns false when QIE has no real name data — forces re-verification.
-   */
+  // Word-level match: every QIE name word must appear in the entered name (max 1 extra word allowed)
   function checkNameMatch(entered: string, first: string, last: string): boolean {
     const norm     = (s: string) => stripQIEPlaceholders(s).toLowerCase();
     const qieWords = norm(`${first} ${last}`).split(" ").filter(Boolean);
     const entWords = entered.trim().toLowerCase().replace(/\s+/g, " ").split(" ").filter(Boolean);
-    // No real QIE name words (all were placeholders) → block
     if (qieWords.length === 0) return false;
-    // Nothing entered → block
     if (entWords.length === 0) return false;
-    // Every real word in the QIE name must appear as an exact whole word in what was entered.
     if (!qieWords.every(w => entWords.includes(w))) return false;
-    // At most 1 extra word beyond the QIE name (allows one middle name / suffix).
-    // This prevents "Attacker Nishant Kholiya" passing when QIE is "Nishant Kholiya".
-    const extraWords = entWords.filter(w => !qieWords.includes(w));
-    return extraWords.length <= 1;
+    return entWords.filter(w => !qieWords.includes(w)).length <= 1;
   }
 
-  /**
-   * Poll /api/qiepass/status/{requestId} every 3 s until:
-   *   - status === "approved"                               → return claims object
-   *   - status === "rejected" / "consent_rejected" / "expired" → return null
-   *   - 2-minute timeout                                    → return null
-   *
-   * NOTE: The status API route normalises consent_given + vcMetadata.ready → "approved"
-   *       and consent_rejected → "rejected", so we primarily check for those.
-   */
   async function pollForQIEApproval(
     requestId: string
   ): Promise<Record<string, unknown> | null> {
@@ -1286,23 +1164,15 @@ export default function CandidatePage() {
 
         const { status, claimed } = json.data;
 
-        // Status route returns "approved" once consent_given + vcMetadata.ready + claimed
         if (status === "approved") {
           return claimed?.claims ?? {};
         }
 
-        // User rejected in QIE Wallet, or request expired
-        if (
-          status === "rejected" ||
-          status === "consent_rejected" ||
-          status === "expired"
-        ) {
+        if (status === "rejected" || status === "consent_rejected" || status === "expired") {
           return null;
         }
-
-        // "pending_consent" | "consent_given" (VC not ready yet) → keep polling
       } catch {
-        // network hiccup — keep polling
+        // network error — keep polling
       }
     }
     return null; // timed out
@@ -1321,13 +1191,7 @@ export default function CandidatePage() {
     setQieGateState("idle");
     setQieGateRequestId("");
 
-    // Hard gate — abort self-attest if QIE Pass claims are missing
-    // SECURITY: name match is MANDATORY. Without it anyone could attest fake
-    // credentials. The stored claims come from QIE Pass KYC — they are the
-    // ground truth. If claims are empty the user MUST re-verify QIE Pass first.
     if (isQIEPassVerified && address) {
-
-      //Load stored claims
       let claimsFirst = qiePassFirst;
       let claimsLast  = qiePassLast;
 
@@ -1344,11 +1208,7 @@ export default function CandidatePage() {
         } catch { /* ignore */ }
       }
 
-      // When QIE Pass sandbox API returns empty claims (known sandbox limitation —
-      // test API does not always populate real names), skip name matching and
-      // allow attest to proceed. The user's entered name is still recorded on-chain.
       if (claimsFirst || claimsLast) {
-        //Name match check — only when we actually have a reference name from QIE
         if (!checkNameMatch(candName.trim(), claimsFirst, claimsLast)) {
           setErr(
             "Name doesn't match your QIE Pass identity. " +
@@ -1360,11 +1220,9 @@ export default function CandidatePage() {
 
       setQieGateState("approved");
     }
-    //End QIE Gate
 
     setAttestLoading(true);
 
-    // Build the private details object
     const details: CredMetaDetails = {
       candidateName:   candName.trim(),
       institutionName: institution.trim(),
@@ -1385,7 +1243,6 @@ export default function CandidatePage() {
       details.title = courseName.trim();
 
     try {
-      // ① Encrypt & pin metadata to IPFS via server-side API
       const encRes = await fetch("/api/metadata/encrypt", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
@@ -1399,12 +1256,10 @@ export default function CandidatePage() {
       }
       const metadataCID: string = encJson.cid;
 
-      // ② credentialHash = keccak256(JSON.stringify(details)) — proves data integrity on-chain
       const credentialHash = ethers.keccak256(
         ethers.toUtf8Bytes(JSON.stringify(details))
       ) as `0x${string}`;
 
-      // Fetch DID from localStorage
       let freshDid = qiePassDid;
       if (!freshDid && address) {
         try {
@@ -1416,7 +1271,6 @@ export default function CandidatePage() {
         } catch { /* ignore */ }
       }
 
-      // ④ Switch to correct QIE chain and submit
       const eth = typeof window !== "undefined" ? (window as any).ethereum : null;
       const chainHex = "0x" + QIE_CHAIN_ID.toString(16);
       if (eth) {

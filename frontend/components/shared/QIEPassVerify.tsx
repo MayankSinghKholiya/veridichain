@@ -1,9 +1,5 @@
 "use client";
 
-// QIE Pass verification flow component.
-// Testnet (1983) and mainnet (1990) use separate localStorage keys so a testnet
-// KYC doesn't bleed into mainnet. Same wallet gets separate verifications per role.
-
 import { useState, useEffect, useCallback } from "react";
 import { QIE_CHAIN_ID } from "../../lib/wagmi";
 
@@ -17,53 +13,35 @@ type VerifyState =
   | "error";
 
 interface StoredPass {
-  verified:    boolean;
-  did:         string;
-  requestId?:  string;
-  claims?:     Record<string, unknown>;
-  verifiedAt:  number;
-  /** ISO string — when QIE VC expires and a new request can be created */
+  verified:     boolean;
+  did:          string;
+  requestId?:   string;
+  claims?:      Record<string, unknown>;
+  verifiedAt:   number;
   vcExpiresAt?: string;
 }
 
 export type QIEPassRole = "candidate" | "institution";
 
 interface Props {
-  /** Connected wallet address */
-  address: `0x${string}` | undefined;
-  /**
-   * Role determines the localStorage namespace.
-   * "candidate"   → key: qiepass:candidate:{chainId}:0xWallet
-   * "institution" → key: qiepass:institution:{chainId}:0xWallet
-   * Same wallet gets SEPARATE verifications per role and per chain.
-   */
-  role?: QIEPassRole;
-  /** Claims to request from QIE Pass */
-  requestedClaims?: string[];
-  /** Called when KYC verification is complete */
-  onVerified?: (did: string, claims: Record<string, unknown>) => void;
-  /** compact = just badge; full = badge + button (default) */
-  variant?: "compact" | "full";
-  /**
-   * locked = institution mode.
-   * Once verified, the badge is permanent — no Change / Remove buttons shown.
-   * Prevents an institution from removing KYC after registration.
-   */
-  locked?: boolean;
+  address:           `0x${string}` | undefined;
+  role?:             QIEPassRole;
+  requestedClaims?:  string[];
+  onVerified?:       (did: string, claims: Record<string, unknown>) => void;
+  variant?:          "compact" | "full";
+  locked?:           boolean;
 }
 
-// Key format: qiepass:{role}:{chainId}:{address}
 function storageKey(role: QIEPassRole, address: string): string {
   return `qiepass:${role}:${QIE_CHAIN_ID}:${address.toLowerCase()}`;
 }
-// Legacy key without chain ID — only used for one-time migration reads
+
 function legacyStorageKey(role: QIEPassRole, address: string): string {
   return `qiepass:${role}:${address.toLowerCase()}`;
 }
 
 function getStoredPass(role: QIEPassRole, address: string): StoredPass | null {
   try {
-    // Try chain-scoped key first; fall back to legacy key for one-time migration
     const raw = localStorage.getItem(storageKey(role, address))
              ?? localStorage.getItem(legacyStorageKey(role, address));
     return raw ? (JSON.parse(raw) as StoredPass) : null;
@@ -73,7 +51,6 @@ function getStoredPass(role: QIEPassRole, address: string): StoredPass | null {
 function setStoredPass(role: QIEPassRole, address: string, pass: StoredPass) {
   try {
     localStorage.setItem(storageKey(role, address), JSON.stringify(pass));
-    // Clean up legacy un-scoped key on write (one-time migration)
     localStorage.removeItem(legacyStorageKey(role, address));
   } catch { /* ignore */ }
 }
@@ -96,13 +73,6 @@ export function QIEPassVerify({
   const [storedPass,  setStoredPassState] = useState<StoredPass | null>(null);
   const [errorMsg,    setErrorMsg]    = useState("");
   const [pollCount,   setPollCount]   = useState(0);
-  /**
-   * Why QIE blocked the last request (set when alreadyVerified=true, null otherwise).
-   * Drives context-aware error messages without string-matching hacks.
-   *   "vc_active"  — VC hasn't expired; user must wait
-   *   "vc_expired" — VC expired but QIE cleanup pending; retry in ~1-2 hours
-   *   "unknown"    — no expiry info from QIE
-   */
   const [blockReason,    setBlockReason]    = useState<"vc_active" | "vc_expired" | "unknown" | null>(null);
   const [kycRedirectUrl, setKycRedirectUrl] = useState<string | null>(null);
 
@@ -137,11 +107,9 @@ export function QIEPassVerify({
 
       const { status, claimed } = json.data;
 
-      // API route normalises consent_given → approved, but guard both
       const isApproved = status === "approved" || status === "consent_given";
 
       if (isApproved) {
-        // Prefer real DID from API response over what user typed
         const resolvedDid =
           (json.data.did as string | undefined) ||
           (claimed?.did   as string | undefined) ||
@@ -150,10 +118,8 @@ export function QIEPassVerify({
         const freshClaims  = (claimed?.claims ?? {}) as Record<string, unknown>;
         const nameInFresh  = !!(String(freshClaims.firstName ?? "").trim() || String(freshClaims.lastName ?? "").trim());
 
-        // Race condition: multiple concurrent polls can both trigger while
-        // status is "consent_given". claimAndVerify is single-use — the server
-        // deduplicates it, but the second poll response might still arrive with
-        // no claims (claimError). If we already stored a good name, keep it.
+        // claimAndVerify is single-use; if a concurrent poll already consumed it,
+        // the second response may arrive with no claims — keep existing name if so.
         const existingClaims = storedPass?.claims ?? {};
         const nameInExisting = !!(
           String(existingClaims.firstName ?? "").trim() ||
@@ -231,13 +197,6 @@ export function QIEPassVerify({
         redirectUrl?:  string;
       };
 
-      // This means an active VC exists. We CANNOT get a new request until it expires.
-      //
-      // The name is REQUIRED — self-attest name-matching won't work without it.
-      // So we do NOT auto-approve here. Instead:
-      //   • Priority 1 — claims came in the 409 body (rare but possible)
-      //   • Priority 2 — claims are in localStorage from a previous successful flow
-      //   • Otherwise  — show expiry countdown and ask user to retry after VC expires
       if (alreadyVerified) {
         const hasName = (c?: Record<string, unknown>) =>
           !!(String(c?.firstName ?? "").trim() || String(c?.lastName ?? "").trim());
@@ -254,7 +213,6 @@ export function QIEPassVerify({
           return;
         }
 
-        // Name already in localStorage from same session — restore it
         if (hasName(storedPass?.claims)) {
           const restored: StoredPass = {
             ...storedPass,
@@ -270,11 +228,7 @@ export function QIEPassVerify({
           return;
         }
 
-        // Try claimAndVerify one more time — 409 means VC is still active.
-        // Prior call might have failed silently (race condition / network error).
-        // When QIE returns 409 the VC is still active. The prior claimAndVerify
-        // call might have failed silently (race condition / network error). Try
-        // once more — server-side cache deduplicates it, so this is safe.
+        // One more attempt via fetch-claims — server deduplicates, safe to retry.
         const priorRid = rid || storedPass?.requestId;
         if (priorRid) {
           try {
@@ -302,15 +256,9 @@ export function QIEPassVerify({
           } catch { /* fetch-claims failed — fall through to expiry message */ }
         }
 
-        // The name IS required for self-attest verification. We cannot proceed
-        // without it. Use blockReason (set by the server) for accurate guidance:
-        //   "vc_active"  → VC hasn't expired; user must wait until vcExpiresAt
-        //   "vc_expired" → VC past expiry but QIE cleanup job hasn't run; retry in 1–2 h
-        //   "unknown"    → QIE blocked for unclear reason; contact support if persistent
         const br = apiBlockReason ?? "unknown";
         setBlockReason(br);
 
-        // Persist vcExpiresAt so the "name not synced" warning in approved UI is accurate
         if (vcExpiresAt && address) {
           try {
             const k = storageKey(role, address);
@@ -337,7 +285,6 @@ export function QIEPassVerify({
             `a new verification request will appear in your QIE Wallet.`
           );
         } else {
-          // "unknown" — QIE blocked without expiry data
           setErrorMsg(
             "QIE is blocking this request — the DID pairing may still be active on QIE's side. " +
             "If this continues after a few hours, contact QIE Pass support."
@@ -351,26 +298,18 @@ export function QIEPassVerify({
       setState("pending");
       setPollCount(0);
 
-      // New user — needs KYC first before they can approve the request
       if ((userStatus === "not_verified" || userStatus === "unverified") && redirectUrl) {
         setKycRedirectUrl(redirectUrl);
       } else {
         setKycRedirectUrl(null);
       }
 
-      // Immediately poll once for already-verified users
       if (userStatus === "verified") { setTimeout(() => pollStatus(rid), 1000); }
     } catch {
       setErrorMsg("Network error — check connection and try again");
       setState("error");
     }
   }
-
-  // KYC verification is a ONE-TIME permanent action for both candidate and
-  // institution. Once a DID is verified with QIE Pass it cannot be changed
-  // or removed — QIE permanently pairs the DID with this partner, and the
-  // name from QIE is the ground truth for self-attest name matching.
-  // The disclaimer shown before verification makes this clear to the user.
 
   if (state === "approved" && storedPass) {
     const date = new Date(storedPass.verifiedAt).toLocaleDateString("en-IN", {
@@ -389,7 +328,6 @@ export function QIEPassVerify({
       );
     }
 
-    // Strip QIE placeholder tokens (e.g. "Unknown") from display and matching
     const stripPlaceholders = (s: string) => {
       const PLACEHOLDERS = new Set(["unknown", "n/a", "null", "undefined", "none", "na"]);
       return s.trim().split(/\s+/).filter(w => w && !PLACEHOLDERS.has(w.toLowerCase())).join(" ");
@@ -416,7 +354,6 @@ export function QIEPassVerify({
           </div>
         </div>
 
-        {/* Warning when name not available — informational only, no action possible */}
         {!hasName && (
           <div className="rounded-xl px-3 py-2.5 border border-amber-500/20 text-xs text-amber-300/60 leading-relaxed space-y-1"
             style={{ background: "rgba(245,158,11,0.05)" }}>
@@ -438,8 +375,6 @@ export function QIEPassVerify({
     );
   }
 
-  // Candidate and institution are mutually exclusive on VeridiChain.
-  // If the opposite role is already verified for this wallet, block immediately.
   const oppositeRole: QIEPassRole = role === "candidate" ? "institution" : "candidate";
   const isConflicted = !!(address && getStoredPass(oppositeRole, address)?.verified);
 
@@ -462,8 +397,6 @@ export function QIEPassVerify({
   if (state === "idle") {
     return (
       <div className="space-y-3">
-        {/* One-time permanent warning — shown BEFORE user starts */}
-        {/* Sandbox mode notice */}
         <div className="rounded-2xl px-4 py-3 border border-violet-500/30 space-y-1"
           style={{ background: "rgba(139,92,246,0.07)" }}>
           <p className="text-violet-300/90 font-semibold text-xs flex items-center gap-1.5">
@@ -632,18 +565,11 @@ export function QIEPassVerify({
     );
   }
 
-  // blockReason is set by the 409 handler and drives the contextual UI:
-  //   "vc_active"  → VC hasn't expired — no wallet steps, no "Try again" (pointless until expiry)
-  //   "vc_expired" → VC expired but QIE cleanup pending — "Try again in 1-2h" + wallet steps after retry
-  //   "unknown"    → generic block — no wallet steps (no pending request was created)
-  //   null         → network/other error — show generic help
-
   return (
     <div className="glass rounded-2xl p-5 space-y-3 border-amber-500/15">
       <p className="text-amber-300 font-semibold text-sm">⚠️ Verification issue</p>
       <p className="text-amber-300/50 text-xs leading-relaxed">{errorMsg}</p>
 
-      {/* vc_expired: after clicking "Try again" + QIE cleanup, a NEW request will appear in wallet */}
       {blockReason === "vc_expired" && (
         <div className="rounded-xl px-3 py-2.5 border border-sky-500/15 text-xs text-sky-300/50 leading-relaxed"
           style={{ background: "rgba(14,165,233,0.04)" }}>
@@ -653,7 +579,6 @@ export function QIEPassVerify({
         </div>
       )}
 
-      {/* vc_active: VC is live — user just needs to wait, no action possible yet */}
       {blockReason === "vc_active" && (
         <div className="rounded-xl px-3 py-2.5 border border-white/[0.06] text-xs text-white/25 leading-relaxed"
           style={{ background: "rgba(255,255,255,0.02)" }}>
@@ -661,7 +586,6 @@ export function QIEPassVerify({
         </div>
       )}
 
-      {/* null / "unknown": generic error — show wallet hint only if no blockReason (could be unrelated error) */}
       {!blockReason && (
         <div className="rounded-xl px-3 py-2.5 border border-amber-500/15 text-xs text-amber-300/40 leading-relaxed"
           style={{ background: "rgba(245,158,11,0.04)" }}>
@@ -669,9 +593,6 @@ export function QIEPassVerify({
         </div>
       )}
 
-      {/* "Try again" goes to input state.
-          Hidden when VC is still ACTIVE — retrying immediately will just get
-          another 409. User must wait for vcExpiresAt. */}
       {blockReason !== "vc_active" && (
         <div className="pt-1">
           <button onClick={() => { setErrorMsg(""); setBlockReason(null); setState("input"); }}

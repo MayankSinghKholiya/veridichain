@@ -5,7 +5,6 @@ import { useConnect } from "wagmi";
 import { showToast } from "./toast";
 import { IS_MOBILE_CLIENT } from "./wagmi";
 
-// QIE Wallet deep-link scheme (confirmed from WalletConnect registry).
 const QIE_DEEPLINK = "qiemobilewalletconnect://wc?uri=";
 
 export type WalletOptionKind = "injected" | "walletconnect";
@@ -24,12 +23,9 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
   const [env, setEnv] = useState<{ hasInjected: boolean } | null>(null);
 
   useEffect(() => {
-    // Require .request() — iOS Safari and some apps inject window.ethereum stubs
-    // that look truthy but have no .request(), crashing on connect.
     const eth = (window as unknown as { ethereum?: { request?: unknown } }).ethereum;
-    setEnv({
-      hasInjected: !!eth && typeof eth.request === "function",
-    });
+    // Some mobile browsers inject a stub window.ethereum without .request()
+    setEnv({ hasInjected: !!eth && typeof eth.request === "function" });
   }, []);
 
   const connectWith = (connector: Parameters<typeof connect>[0]["connector"]) =>
@@ -41,9 +37,6 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
       },
     });
 
-  // Mobile: bypass @reown/appkit modal (it crashes on iOS/Android browsers).
-  // Get the raw WC EthereumProvider via getProvider(), listen to its display_uri
-  // event, then deep-link directly into the QIE Wallet app.
   const connectViaDeeplink = (hookConn: Parameters<typeof connect>[0]["connector"]) => {
     void (async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -89,8 +82,6 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
     const injectedConn = connectors.find((c) => c.type === "injected" || c.id === "injected");
     const wcConn       = connectors.find((c) => c.type === "walletConnect" || c.id === "walletConnect");
 
-    // Show injected option when a real wallet is present (e.g. QIE Wallet in-app browser,
-    // MetaMask extension). On mobile without a real wallet, hasInjected is false.
     if (env.hasInjected && injectedConn) {
       options.push({
         id:       "injected",
@@ -102,7 +93,6 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
       });
     }
 
-    // WalletConnect deep-link only on mobile — desktop users use browser extension.
     if (wcConn && IS_MOBILE_CLIENT) {
       options.push({
         id:       "walletconnect",

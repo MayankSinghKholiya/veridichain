@@ -52,16 +52,12 @@ export default function InstitutionPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
-  // localStorage is a fast UX hint only — server is source of truth.
-  // If they diverge (e.g. DevTools clear), server check wins.
   const { hasPass, did: passDid, passConfigured } = useQIEPass(address);
   const [isQIEPassVerified,     setIsQIEPassVerified]     = useState(false);
   const [qiePassDid,            setQiePassDid]            = useState("");
   const [kycCheckLoading,       setKycCheckLoading]       = useState(false);
-  // Wallet verified as candidate = can't also be institution (roles are mutually exclusive)
   const [isBlockedByRole,       setIsBlockedByRole]       = useState(false);
 
-  // Reset all QIE Pass state when wallet disconnects
   useEffect(() => {
     if (address) return;
     setIsQIEPassVerified(false);
@@ -73,7 +69,6 @@ export default function InstitutionPage() {
   useEffect(() => {
     if (!address) return;
 
-    // Check both chain-scoped and legacy key (migration)
     try {
       const candKey    = `qiepass:candidate:${QIE_CHAIN_ID}:${address.toLowerCase()}`;
       const candLegacy = `qiepass:candidate:${address.toLowerCase()}`;
@@ -102,10 +97,6 @@ export default function InstitutionPage() {
       }
     } catch { /* ignore */ }
 
-    // Overrides localStorage — cannot be bypassed by clearing browser storage.
-    // NOTE: QIE Pass API is role-agnostic (no candidate/institution distinction).
-    //       The role conflict check above already blocked candidate wallets,
-    //       so by this point we know the wallet is NOT a candidate.
     setKycCheckLoading(true);
     fetch(`/api/qiepass/institution-verify?wallet=${address.toLowerCase()}`)
       .then((r) => r.json())
@@ -114,15 +105,11 @@ export default function InstitutionPage() {
           setIsQIEPassVerified(true);
           if (data.did) setQiePassDid(data.did);
         } else {
-          // Server says NOT verified — override any stale localStorage state
           setIsQIEPassVerified(false);
           setQiePassDid("");
         }
       })
-      .catch(() => {
-        // API error — fall back to localStorage hint (already set above)
-        // Fail-open only on network error; not a security bypass
-      })
+      .catch(() => { /* fall back to localStorage hint set above */ })
       .finally(() => setKycCheckLoading(false));
   }, [address]);
 
