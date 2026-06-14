@@ -102,16 +102,15 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
       });
     }
 
-    if (wcConn) {
+    // WalletConnect deep-link only on mobile — desktop users use browser extension.
+    if (wcConn && IS_MOBILE_CLIENT) {
       options.push({
         id:       "walletconnect",
-        label:    IS_MOBILE_CLIENT ? "Connect QIE Wallet" : "WalletConnect",
-        sublabel: IS_MOBILE_CLIENT ? "Opens QIE Wallet app" : "Scan QR with your phone",
+        label:    "Connect QIE Wallet",
+        sublabel: "Opens QIE Wallet app",
         icon:     "📱",
         kind:     "walletconnect",
-        // Mobile: deep-link into QIE Wallet (bypasses crashing modal).
-        // Desktop: WC QR modal (works fine on desktop).
-        run: () => IS_MOBILE_CLIENT ? connectViaDeeplink(wcConn) : connectWith(wcConn),
+        run:      () => connectViaDeeplink(wcConn),
       });
     }
   }

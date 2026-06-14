@@ -82,7 +82,7 @@ const connectors = [
     ? [
         walletConnect({
           projectId: WC_PROJECT_ID,
-          showQrModal: !IS_MOBILE_CLIENT,   // desktop → QR modal; mobile → no modal
+          showQrModal: false,   // modal handled manually via deep-link (mobile only)
           metadata: {
             name: "VeridiChain",
             description: "Decentralized credential verification on QIE Blockchain",
