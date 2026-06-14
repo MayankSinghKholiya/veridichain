@@ -42,8 +42,14 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
   const [env, setEnv] = useState<{ hasInjected: boolean; mobile: boolean } | null>(null);
 
   useEffect(() => {
+    // A real injected wallet exposes an EIP-1193 provider with a `.request()`
+    // function. Some mobile browsers (esp. iOS Safari) inject a truthy stub on
+    // window.ethereum that has NO .request — connecting to it throws
+    // "undefined is not an object (evaluating 'e.request')". Require .request so
+    // those stubs are ignored and the user gets WalletConnect instead.
+    const eth = (window as unknown as { ethereum?: { request?: unknown } }).ethereum;
     setEnv({
-      hasInjected: typeof window !== "undefined" && !!(window as unknown as { ethereum?: unknown }).ethereum,
+      hasInjected: typeof window !== "undefined" && !!eth && typeof eth.request === "function",
       mobile: typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent),
     });
   }, []);
@@ -69,29 +75,28 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
     const injectedConn = connectors.find((c) => c.type === "injected" || c.id === "injected");
     const wcConn       = connectors.find((c) => c.type === "walletConnect" || c.id === "walletConnect");
 
-    // 1. Browser wallet — only when an injected provider actually exists.
-    if (injectedConn && env.hasInjected) {
-      options.push({
-        id: "injected",
-        label: "Browser Wallet",
-        sublabel: "MetaMask · OKX · QIE Wallet extension",
-        icon: "🦊",
-        kind: "injected",
-        run: () => connectWith(injectedConn),
-      });
-    }
+    const injectedOption: WalletOption | null = injectedConn && env.hasInjected ? {
+      id: "injected",
+      label: "Browser Wallet",
+      sublabel: "MetaMask · OKX · QIE Wallet extension",
+      icon: "🦊",
+      kind: "injected",
+      run: () => connectWith(injectedConn),
+    } : null;
 
-    // 2. WalletConnect — works everywhere (QR on desktop, deep-link on mobile).
-    if (wcConn) {
-      options.push({
-        id: "walletconnect",
-        label: "WalletConnect",
-        sublabel: env.mobile ? "Open your wallet app" : "Scan QR with your phone",
-        icon: "📱",
-        kind: "walletconnect",
-        run: () => connectWith(wcConn),
-      });
-    }
+    const wcOption: WalletOption | null = wcConn ? {
+      id: "walletconnect",
+      label: "WalletConnect",
+      sublabel: env.mobile ? "Open your wallet app" : "Scan QR with your phone",
+      icon: "📱",
+      kind: "walletconnect",
+      run: () => connectWith(wcConn),
+    } : null;
+
+    // On mobile, WalletConnect is the reliable path → make it primary.
+    // On desktop, the browser extension (injected) is the natural primary.
+    const ordered = env.mobile ? [wcOption, injectedOption] : [injectedOption, wcOption];
+    for (const opt of ordered) if (opt) options.push(opt);
 
     // 3. Open in QIE Wallet in-app browser (mobile + configured scheme only).
     const qieLink = env.mobile ? buildQieDeeplink() : null;
