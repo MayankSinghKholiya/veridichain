@@ -57,7 +57,7 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
       options.push({
         id:       "walletconnect",
         label:    "WalletConnect",
-        sublabel: "Scan QR or open in wallet app",
+        sublabel: "All wallets — QR or app",
         icon:     "📱",
         kind:     "walletconnect",
         run:      () => connectWith(wcConn),

@@ -74,7 +74,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://veridichain-ivory.ve
 
 // Connectors:
 //   • injected()      — desktop extensions + any wallet in-app browser (window.ethereum)
-//   • walletConnect() — mobile wallets via QR scan (desktop) or app deep-link (mobile)
+//   • walletConnect() — mobile wallets via wallet chooser modal (desktop: QR scan)
 // WalletConnect is added only when a project ID is configured.
 const connectors = [
   injected(),
