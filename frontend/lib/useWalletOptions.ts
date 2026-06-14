@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from "react";
 import { useConnect } from "wagmi";
+import { showToast } from "./toast";
 
 export type WalletOptionKind = "injected" | "walletconnect" | "qie-deeplink";
 
@@ -47,6 +48,21 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
     });
   }, []);
 
+  // wagmi's connect() swallows errors into mutation state — surface them so a
+  // failed WalletConnect init (the usual "nothing happens" cause on mobile) is
+  // visible instead of silent.
+  const connectWith = (connector: Parameters<typeof connect>[0]["connector"]) =>
+    connect(
+      { connector },
+      {
+        onError: (err) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.error("[wallet-connect] connect failed:", err);
+          showToast(`Wallet connect failed: ${msg}`, "error");
+        },
+      },
+    );
+
   const options: WalletOption[] = [];
 
   if (env) {
@@ -61,7 +77,7 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
         sublabel: "MetaMask · OKX · QIE Wallet extension",
         icon: "🦊",
         kind: "injected",
-        run: () => connect({ connector: injectedConn }),
+        run: () => connectWith(injectedConn),
       });
     }
 
@@ -73,7 +89,7 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
         sublabel: env.mobile ? "Open your wallet app" : "Scan QR with your phone",
         icon: "📱",
         kind: "walletconnect",
-        run: () => connect({ connector: wcConn }),
+        run: () => connectWith(wcConn),
       });
     }
 
@@ -98,7 +114,7 @@ export function useWalletOptions(): { options: WalletOption[]; ready: boolean } 
         label: "Connect Wallet",
         icon: "🔗",
         kind: "injected",
-        run: () => connect({ connector: injectedConn }),
+        run: () => connectWith(injectedConn),
       });
     }
   }
