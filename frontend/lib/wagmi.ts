@@ -72,25 +72,17 @@ export const WC_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ??
 // Where the dApp is hosted — used in WalletConnect metadata shown to the wallet.
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://veridichain-ivory.vercel.app";
 
-// On mobile we skip the WalletConnect modal (it fails to init inside mobile
-// browsers) and deep-link straight into the QIE Wallet app instead — see
-// connectViaQieDeeplink in useWalletOptions. The built-in QR modal is kept for
-// desktop, where it works reliably.
-const IS_MOBILE_CLIENT =
-  typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
 // Connectors:
 //   • injected()      — desktop extensions + any wallet in-app browser (window.ethereum)
 //   • walletConnect() — mobile wallets via QR scan (desktop) or app deep-link (mobile)
 // WalletConnect is added only when a project ID is configured.
 const connectors = [
-  // Supports any injected wallet: QIE Wallet, OKX, MetaMask, Rabby, etc.
   injected(),
   ...(WC_PROJECT_ID
     ? [
         walletConnect({
           projectId: WC_PROJECT_ID,
-          showQrModal: !IS_MOBILE_CLIENT,
+          showQrModal: true,
           metadata: {
             name: "VeridiChain",
             description: "Decentralized credential verification on QIE Blockchain",
