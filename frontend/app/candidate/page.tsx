@@ -623,6 +623,7 @@ export default function CandidatePage() {
   const [tab,      setTab]      = useState<Tab>("credentials");
   const [form,     setForm]     = useState({ data: "", ipfsCID: "" });
   const [err,      setErr]      = useState("");
+  const [nameWarn, setNameWarn] = useState("");
 
   const { hasPass, did: passDid, passConfigured } = useQIEPass(address);
   const [isQIEPassVerified, setIsQIEPassVerified] = useState(false);
@@ -1187,6 +1188,7 @@ export default function CandidatePage() {
     if (hasBarcode && !barcodeVal.trim()) { setErr("Please enter the barcode / QR code value"); return; }
 
     setErr("");
+    setNameWarn("");
     attReset();
     setQieGateState("idle");
     setQieGateRequestId("");
@@ -1210,11 +1212,10 @@ export default function CandidatePage() {
 
       if (claimsFirst || claimsLast) {
         if (!checkNameMatch(candName.trim(), claimsFirst, claimsLast)) {
-          setErr(
+          setNameWarn(
             "Name doesn't match your QIE Pass identity. " +
-            "Enter your full name exactly as registered in QIE Pass (open QIE Wallet → Profile to check)."
+            "Your credential will still be submitted, but manual verification may be required."
           );
-          return;
         }
       }
 
@@ -2365,6 +2366,15 @@ export default function CandidatePage() {
                             className="text-xs bg-amber-500/20 border border-amber-500/40 text-amber-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-amber-500/30 transition-colors">
                             {c.switchNow}
                           </button>
+                        </div>
+                      )}
+
+                      {/* Name mismatch warning — soft, non-blocking */}
+                      {nameWarn && (
+                        <div className="rounded-xl px-4 py-3 flex items-start gap-3 border border-amber-500/30"
+                          style={{ background: "rgba(245,158,11,0.08)" }}>
+                          <span className="mt-0.5 shrink-0">⚠️</span>
+                          <p className="text-amber-300 text-sm leading-relaxed">{nameWarn}</p>
                         </div>
                       )}
 
