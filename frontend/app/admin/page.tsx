@@ -876,12 +876,12 @@ export default function AdminPage() {
     if (isMember && tab === "institutions") loadInstitutions();
   }, [isMember, tab, loadInstitutions]);
 
-  const { writeContract: doApproveW, data: approveHash, error: approveError, reset: approveReset } = useWriteContract();
-  const { writeContract: doRejectW,  data: rejectHash,  error: rejectError,  reset: rejectReset  } = useWriteContract();
-  const { writeContract: doVerifyInstW,  data: verifyInstHash  } = useWriteContract();
-  const { writeContract: doSlashInstW,   data: slashInstHash   } = useWriteContract();
-  const { writeContract: doRejectInstW,  data: rejectInstHash  } = useWriteContract();
-  const { writeContract: doRevokeInstW,  data: revokeInstHash  } = useWriteContract();
+  const { writeContract: doApproveW,    data: approveHash,    error: approveError,    reset: approveReset    } = useWriteContract();
+  const { writeContract: doRejectW,     data: rejectHash,     error: rejectError,     reset: rejectReset     } = useWriteContract();
+  const { writeContract: doVerifyInstW, data: verifyInstHash, error: verifyInstError, reset: verifyInstReset } = useWriteContract();
+  const { writeContract: doSlashInstW,  data: slashInstHash,  error: slashInstError,  reset: slashInstReset  } = useWriteContract();
+  const { writeContract: doRejectInstW, data: rejectInstHash, error: rejectInstError, reset: rejectInstReset } = useWriteContract();
+  const { writeContract: doRevokeInstW, data: revokeInstHash, error: revokeInstError, reset: revokeInstReset } = useWriteContract();
   const { writeContract: doRevokeCredW,  data: revokeCredHash,  isPending: revokeCredPending,  error: revokeCredError,  reset: revokeCredReset  } = useWriteContract();
   // Separate hook for auto-revoke triggered after reject confirms (keeps manual revoke UI clean)
   const { writeContract: doAutoRevokeW,  data: autoRevokeHash  } = useWriteContract();
@@ -916,21 +916,48 @@ export default function AdminPage() {
     }
   }, [approveOk]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset stuck "Approving..." / "Rejecting..." state when tx errors
   useEffect(() => {
     if (approveError) {
       setActionStates({});
       approveReset();
-      console.error("[admin] approveRequest error:", approveError);
+      showToast(`Approve failed: ${approveError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
     }
   }, [approveError]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (rejectError) {
       setActionStates({});
       rejectReset();
-      console.error("[admin] rejectRequest error:", rejectError);
+      showToast(`Reject failed: ${rejectError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
     }
   }, [rejectError]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (verifyInstError) {
+      setVerifyStates({});
+      verifyInstReset();
+      showToast(`Approve institution failed: ${verifyInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+    }
+  }, [verifyInstError]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (rejectInstError) {
+      setRejectInstStates({});
+      rejectInstReset();
+      showToast(`Reject institution failed: ${rejectInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+    }
+  }, [rejectInstError]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (slashInstError) {
+      setSlashStates({});
+      slashInstReset();
+      showToast(`Slash failed: ${slashInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+    }
+  }, [slashInstError]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (revokeInstError) {
+      setRevokeInstStates({});
+      revokeInstReset();
+      showToast(`Revoke institution failed: ${revokeInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+    }
+  }, [revokeInstError]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (rejectOk && autoRevokeQueue) {
