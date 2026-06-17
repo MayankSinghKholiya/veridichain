@@ -2408,7 +2408,7 @@ export default function CandidatePage() {
                         <span className="mt-0.5 shrink-0">🔐</span>
                         <p>Your name, institution, year and barcode are <strong className="text-white/30">end-to-end encrypted</strong> — only visible to VeridiChain admin during manual verification. The public on-chain record only shows the document type.</p>
                       </div>
-                      {qieGateState === "approved" && (
+                      {qieGateState === "approved" && !nameWarn && (
                         <div className="rounded-2xl px-5 py-4 border border-green-500/30 flex items-center gap-3"
                           style={{ background: "rgba(34,197,94,0.07)" }}>
                           <span className="text-xl">✅</span>
