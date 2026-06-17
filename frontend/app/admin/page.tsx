@@ -17,6 +17,7 @@ import {
   ERC20_ABI,
 } from "../../lib/contracts";
 import { getLogsChunked, getLogsInRange } from "../../lib/getLogs";
+import { showToast } from "../../lib/toast";
 import { CRED_DOC_TYPES, type CredDocType, type CredMetaDetails } from "../../lib/credentialMeta";
 import { QIE_CHAIN_ID, QIE_CHAIN_NAME, QIE_RPC, QIE_EXPLORER } from "../../lib/wagmi";
 
@@ -1009,7 +1010,7 @@ export default function AdminPage() {
   }
   async function handleReject(reqId: number) {
     const reason = rejectReason[reqId] ?? "";
-    if (!reason.trim()) return;
+    if (!reason.trim()) { showToast("Rejection reason is required before rejecting.", "error"); return; }
     if (!await ensureChain()) return;
 
     // Queue auto-revoke: after reject tx confirms, revokeCredential fires automatically
