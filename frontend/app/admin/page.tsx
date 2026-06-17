@@ -916,18 +916,32 @@ export default function AdminPage() {
     }
   }, [approveOk]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  function clearReqCache() {
+    if (typeof window !== "undefined") {
+      Object.keys(sessionStorage).filter((k) => k.startsWith("vc:admin:reqs:")).forEach((k) => sessionStorage.removeItem(k));
+    }
+  }
+
   useEffect(() => {
     if (approveError) {
       setActionStates({});
       approveReset();
-      showToast(`Approve failed: ${(approveError as any).shortMessage ?? approveError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+      const msg = (approveError as any).shortMessage ?? approveError.message?.split("\n")[0] ?? "Unknown error";
+      showToast(`Approve failed: ${msg}`, "error");
+      if (msg.toLowerCase().includes("not pending") || msg.toLowerCase().includes("already")) {
+        clearReqCache(); loadRequests();
+      }
     }
   }, [approveError]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (rejectError) {
       setActionStates({});
       rejectReset();
-      showToast(`Reject failed: ${(rejectError as any).shortMessage ?? rejectError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+      const msg = (rejectError as any).shortMessage ?? rejectError.message?.split("\n")[0] ?? "Unknown error";
+      showToast(`Reject failed: ${msg}`, "error");
+      if (msg.toLowerCase().includes("not pending") || msg.toLowerCase().includes("already")) {
+        clearReqCache(); loadRequests();
+      }
     }
   }, [rejectError]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -1318,7 +1332,17 @@ export default function AdminPage() {
 
         {/* ══ PENDING TAB ══ */}
         {tab === "pending" && (
-          reqLoading ? (
+          <>
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => { clearReqCache(); loadRequests(); }}
+                disabled={reqLoading}
+                className="glass glass-hover text-white/60 hover:text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all disabled:opacity-40"
+              >
+                {reqLoading ? "⏳ Refreshing…" : "↻ Refresh"}
+              </button>
+            </div>
+          {reqLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>
           ) : pendingRequests.length === 0 ? (
             <div className="glass rounded-3xl p-16 text-center">
@@ -1338,7 +1362,8 @@ export default function AdminPage() {
                   isCredentialRevoked={revokedCredIds.has(req.credentialId.toLowerCase())} />
               ))}
             </div>
-          )
+          )}
+          </>
         )}
 
         {/* ══ ALL ACTIVITY TAB ══ */}
