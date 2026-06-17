@@ -920,42 +920,42 @@ export default function AdminPage() {
     if (approveError) {
       setActionStates({});
       approveReset();
-      showToast(`Approve failed: ${approveError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+      showToast(`Approve failed: ${(approveError as any).shortMessage ?? approveError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
     }
   }, [approveError]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (rejectError) {
       setActionStates({});
       rejectReset();
-      showToast(`Reject failed: ${rejectError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+      showToast(`Reject failed: ${(rejectError as any).shortMessage ?? rejectError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
     }
   }, [rejectError]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (verifyInstError) {
       setVerifyStates({});
       verifyInstReset();
-      showToast(`Approve institution failed: ${verifyInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+      showToast(`Approve institution failed: ${(verifyInstError as any).shortMessage ?? verifyInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
     }
   }, [verifyInstError]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (rejectInstError) {
       setRejectInstStates({});
       rejectInstReset();
-      showToast(`Reject institution failed: ${rejectInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+      showToast(`Reject institution failed: ${(rejectInstError as any).shortMessage ?? rejectInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
     }
   }, [rejectInstError]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (slashInstError) {
       setSlashStates({});
       slashInstReset();
-      showToast(`Slash failed: ${slashInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+      showToast(`Slash failed: ${(slashInstError as any).shortMessage ?? slashInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
     }
   }, [slashInstError]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (revokeInstError) {
       setRevokeInstStates({});
       revokeInstReset();
-      showToast(`Revoke institution failed: ${revokeInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
+      showToast(`Revoke institution failed: ${(revokeInstError as any).shortMessage ?? revokeInstError.message?.split("\n")[0] ?? "Unknown error"}`, "error");
     }
   }, [revokeInstError]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1027,10 +1027,26 @@ export default function AdminPage() {
     if (setStakeOk) { refetchStakeAmount(); setStakeInput(""); setQieusdErr(""); }
   }, [setStakeOk]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // network before sending transactions. Without this the wallet shows the tx
-  // but gas is never deducted and the tx silently drops.
+  async function checkActiveSigner(): Promise<boolean> {
+    const eth = typeof window !== "undefined" ? (window as any).ethereum : null; // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!eth || !address) return true;
+    try {
+      const accounts: string[] = await eth.request({ method: "eth_accounts" });
+      const active = accounts[0]?.toLowerCase();
+      if (active && active !== address.toLowerCase()) {
+        showToast(
+          `Wallet account mismatch — page is connected as ${address.slice(0, 8)}… but your wallet's active account is ${accounts[0].slice(0, 8)}…. Switch to the correct account in your wallet and reconnect.`,
+          "error"
+        );
+        return false;
+      }
+    } catch { /* ignore */ }
+    return true;
+  }
+
   async function handleApprove(reqId: number) {
     if (!await ensureChain()) return;
+    if (!await checkActiveSigner()) return;
     setActionStates((s) => ({ ...s, [reqId]: "approving" }));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (doApproveW as any)({ address: manualAddr, abi: MANUAL_VERIFICATION_REGISTRY_ABI, functionName: "approveRequest", args: [BigInt(reqId), approveNote[reqId] ?? ""] });
@@ -1039,6 +1055,7 @@ export default function AdminPage() {
     const reason = rejectReason[reqId] ?? "";
     if (!reason.trim()) { showToast("Rejection reason is required before rejecting.", "error"); return; }
     if (!await ensureChain()) return;
+    if (!await checkActiveSigner()) return;
 
     // Queue auto-revoke: after reject tx confirms, revokeCredential fires automatically
     const req = requests.find((r) => r.id === reqId);
@@ -1052,6 +1069,7 @@ export default function AdminPage() {
   }
   async function handleVerifyInst(addr: string) {
     if (!await ensureChain()) return;
+    if (!await checkActiveSigner()) return;
     setVerifyStates((s) => ({ ...s, [addr]: "loading" }));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (doVerifyInstW as any)({ address: instAddr, abi: INSTITUTION_REGISTRY_ABI, functionName: "verifyInstitution", args: [addr as `0x${string}`] });
@@ -1066,6 +1084,7 @@ export default function AdminPage() {
   }
   async function handleRejectInst(addr: string) {
     if (!await ensureChain()) return;
+    if (!await checkActiveSigner()) return;
     setRejectInstStates((s) => ({ ...s, [addr]: "loading" }));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (doRejectInstW as any)({ address: instAddr, abi: INSTITUTION_REGISTRY_ABI, functionName: "rejectInstitution", args: [addr as `0x${string}`] });
